@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 5723635ebc714d5f8ba64d886821c07e
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - separableBlurShader: {fileID: 4800000, guid: e60e86b54ee14fdbb6805adb0c279f54,
+      type: 3}
+  - contrastCompositeShader: {fileID: 4800000, guid: 90879401b6754f668c88077db905237b,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 

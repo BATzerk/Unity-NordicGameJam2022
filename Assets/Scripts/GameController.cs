@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameController : MonoBehaviour {
+    // Properties
+    public int NumGhoulsCaught = 0;
 
 
     // ----------------------------------------------------------------
     // Start
     // ----------------------------------------------------------------
     void Start() {
-        
     }
+
 
 
     // ----------------------------------------------------------------
