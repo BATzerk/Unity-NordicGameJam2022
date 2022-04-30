@@ -66,21 +66,21 @@ public class Mitt : MonoBehaviour
     //  Collision Events
     // ----------------------------------------------------------------
     private void OnTriggerEnter(Collider other) {
-        ProximityVibrator pv = other.gameObject.GetComponentInParent<ProximityVibrator>();
-        if (pv != null) {
-            AddProxVibInRange(pv);
-        }
-        // Ghoul body??
         GhoulCore gb = other.gameObject.GetComponent<GhoulCore>();
+        ProximityVibrator pv = other.gameObject.GetComponentInParent<ProximityVibrator>();
+        GhoulProximityTrigger gpt = other.gameObject.GetComponent<GhoulProximityTrigger>();
+        // Ghoul proximity trigger??
+        if (gpt != null) AddProxVibInRange(pv);
+        // Ghoul body??
         if (gb != null) gb.OnMittEnterMe();
     }
     private void OnTriggerExit(Collider other) {
-        ProximityVibrator pv = other.gameObject.GetComponentInParent<ProximityVibrator>();
-        if (pv != null) {
-            RemoveProxVibInRange(pv);
-        }
-        // Ghoul body??
         GhoulCore gb = other.gameObject.GetComponent<GhoulCore>();
+        ProximityVibrator pv = other.gameObject.GetComponentInParent<ProximityVibrator>();
+        GhoulProximityTrigger gpt = other.gameObject.GetComponent<GhoulProximityTrigger>();
+        // Ghoul proximity trigger??
+        if (gpt != null) RemoveProxVibInRange(pv);
+        // Ghoul body??
         if (gb != null) gb.OnMittExitMe();
     }
 }

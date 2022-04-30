@@ -8,7 +8,6 @@ public class GhoulCore : MonoBehaviour
     [SerializeField] private Ghoul myGhoul;
 
 
-
     // ----------------------------------------------------------------
     //  Events
     // ----------------------------------------------------------------
