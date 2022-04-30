@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3274166546187934773}
   - component: {fileID: 7505303812421805279}
   m_Layer: 0
-  m_Name: BodyTrigger
+  m_Name: GhoulCore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57,6 +57,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a708b1222fc0ff4e8c3e93e28bd510b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myGhoul: {fileID: 6511622798498742984}
 --- !u!1 &6511622798352572050
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26948445632fc884da41d56a8cbf02ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  go_bodyVisuals: {fileID: 6511622798753044060}
   mr_body: {fileID: 6511622798753044057}
   m_slayed: {fileID: 2100000, guid: 26d57ca501335684db7455110089293f, type: 2}
 --- !u!114 &6511622798498742985

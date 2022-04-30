@@ -40,8 +40,8 @@ public class BeamFireVisuals : MonoBehaviour
         sr_circle.enabled = true;
         sr_centerDot.enabled = true;
     }
-    public void OnFireBeam() {
-        ps_beamBurst1.Emit(120);
+    public void OnFireBeam(bool didHitGhoul) {
+        if (didHitGhoul) ps_beamBurst1.Emit(120);
         ps_beamBurst2.Emit(60);
         sr_circle.enabled = false;
         sr_centerDot.enabled = false;

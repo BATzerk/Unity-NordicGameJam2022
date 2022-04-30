@@ -5,13 +5,15 @@ using UnityEngine;
 public class Ghoul : MonoBehaviour
 {
     // Components
+    [SerializeField] private GameObject go_bodyVisuals;
     [SerializeField] private MeshRenderer mr_body;
     // Properties
+    [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
     private Vector2 boundsX = new Vector2(-0.5f, 0.5f);
     private Vector2 boundsY = new Vector2(0.5f, 1.5f);
     private Vector2 boundsZ = new Vector2(0.3f, 1.8f);
-    [SerializeField] private readonly float DriftSpeed = 0.03f; // applied to PerlinNoise
     private bool isSlayed = false;
+    public bool IsFound { get; private set; } = false;
     private float seed0;
     private float seed1;
     private float seed2;
@@ -26,6 +28,8 @@ public class Ghoul : MonoBehaviour
     //  Start
     // ----------------------------------------------------------------
     void Start() {
+        go_bodyVisuals.SetActive(false);
+        // Set my random seedz.
         seed0 = Random.Range(-1000, 1000);
         seed1 = Random.Range(-1000, 1000);
         seed2 = Random.Range(-1000, 1000);
@@ -42,6 +46,7 @@ public class Ghoul : MonoBehaviour
     //  Update
     // ----------------------------------------------------------------
     void Update() {
+        // Update position.
         if (isSlayed) {
             this.transform.position += new Vector3(0, 0.006f, 0);
         }
@@ -73,6 +78,11 @@ public class Ghoul : MonoBehaviour
         mr_body.enabled = true;
         mr_body.material = m_slayed;
         Invoke("DestroySelf", 1.5f);
+    }
+    public void SetIsFoundTrue() {
+        if (IsFound) return; // Safety check; don't do it again.
+        IsFound = true;
+        go_bodyVisuals.SetActive(true);
     }
 
 
