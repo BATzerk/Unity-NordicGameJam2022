@@ -11,7 +11,7 @@ Shader "Custom/FlowMapShader"
         _Metallic ("Metallic", Range(0,1)) = 0.0
         
         _Alpha ("Alpha", Range(0,1)) = 1
-        _AlphaNoise ("FlowMap", 2D) = "white" {}
+        _AlphaNoise ("Alpha noise map", 2D) = "white" {}
         _AlphaNoiseIntensity ("Alpha Noise Intensity", Range(0,2)) = 0.1
     }
     SubShader
