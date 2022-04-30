@@ -5,8 +5,8 @@ Shader "Custom/FlowMapShader"
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _FlowMap ("FlowMap", 2D) = "white" {}
-        _FlowSpeed ("FlowSpeed", Range(0,1)) = 0.1
-        _FlowIntensity ("FlowIntensity", Range(0,1)) = 0.1
+        _FlowSpeed ("FlowSpeed", Range(0,10)) = 10
+        _FlowIntensity ("FlowIntensity", Range(0,1)) = 0.8
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
     }
@@ -56,28 +56,37 @@ Shader "Custom/FlowMapShader"
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             float2 flow = tex2D(_FlowMap, IN.uv_MainTex).xy;
-            //flow = (flow - 0.5) * 2.0; // remap -1 to 1
-            float timePhase1 = fract(_Time * _FlowSpeed); // 0..1
-            float timePhase2 = fract(timePhase1 + 0.5); // 0..1 offset
-//             float timePhase1 = _Time * _FlowSpeed; // 0..1 
-//             float timePhase2 = timePhase1 + 0.5; // 0..1 offset
-            float flowMix = abs(timePhase1 - 0.5) * 2; // oscilating between 0..1
-                        
-            float2 phase1Uv = IN.uv_MainTex + flow * timePhase1 * _FlowIntensity;            
-            float2 phase2Uv = IN.uv_MainTex + flow * timePhase2 * _FlowIntensity;
-
-            float4 phase1Color = tex2D(_MainTex, phase1Uv);
-            float4 phase2Color = tex2D(_MainTex, phase2Uv);
-            
-            
-            float4 color = mix(phase1Color, phase2Color, flowMix);
-//             float4 color = tex2D(_MainTex, phase1Uv);
+            float timePhase1 = sin(_Time * _FlowSpeed); // * -0.5 + 2; // -1..1            
+            float2 phase1Uv = IN.uv_MainTex + flow * timePhase1 * _FlowIntensity;
+            float4 color = tex2D(_MainTex, phase1Uv);
         
             o.Albedo = color;
             o.Alpha = color.a;
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
         }
+        
+//         void surf (Input IN, inout SurfaceOutputStandard o)
+//                 {
+//                     float2 flow = tex2D(_FlowMap, IN.uv_MainTex).xy;
+//                     float timePhase1 = fract(_Time * _FlowSpeed); // 0..1
+//                     float timePhase2 = fract(timePhase1 + 0.5); // 0..1 offset
+//                     float flowMix = abs(timePhase1 - 0.5) * 2; // oscilating between 0..1
+//                                 
+//                     float2 phase1Uv = IN.uv_MainTex + flow * timePhase1 * _FlowIntensity;            
+//                     float2 phase2Uv = IN.uv_MainTex + flow * timePhase2 * _FlowIntensity;
+//         
+//                     float4 phase1Color = tex2D(_MainTex, phase1Uv);
+//                     float4 phase2Color = tex2D(_MainTex, phase2Uv);
+//                     
+//                     
+//                     float4 color = mix(phase1Color, phase2Color, flowMix);
+//                 
+//                     o.Albedo = color;
+//                     o.Alpha = color.a;
+//                     o.Metallic = _Metallic;
+//                     o.Smoothness = _Glossiness;
+//                 }
         ENDCG
     }
     FallBack "Diffuse"
