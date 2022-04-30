@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameController : MonoBehaviour {
+    public enum GameState { Undefined, Setup0, Setup1, Playing, GameOver }
     // References
     [SerializeField] private BeamFireVisuals beamFireVisuals;
     [SerializeField] private GameHUD gameHUD;
@@ -10,17 +11,19 @@ public class GameController : MonoBehaviour {
     [SerializeField] private Transform tf_head; // headset.
     [SerializeField] private Mitt mittL;
     [SerializeField] private Mitt mittR;
-    private List<Ghoul> ghouls;
+    [SerializeField] private PlayerNarration playerNarration;
+    private List<Ghoul> ghouls = new List<Ghoul>();
     // Properties
     [SerializeField] public float TimePerRound = 91;
     public const float BeamChargeupDuration = 2f;
+    public GameState gameState { get; private set; } = GameState.Setup0;
     public int NumBeamsFired { get; private set; } = 0;
     public int NumGhoulsCaught { get; private set; } = 0;
     public bool IsChargingBeam { get; private set; }
     public float TimeChargingBeam { get; private set; } // how long we've held down a beam charge button.
     public float TimeLeft { get; private set; }
     public bool IsPaused { get; private set; } = false;
-    public bool IsGameOver { get; private set; } = false;
+    public bool IsGameOver { get { return gameState == GameState.GameOver; } }
 
     // Getters
     private bool MayStartChargingBeam() {
@@ -32,12 +35,8 @@ public class GameController : MonoBehaviour {
     // Start
     // ----------------------------------------------------------------
     void Start() {
-        TimeLeft = TimePerRound;
-        gameHUD.UpdateTexts();
-        go_gameOverLight.SetActive(false);
-        ghouls = new List<Ghoul>(FindObjectsOfType<Ghoul>()); // hacky, just find all the ghouls that are already in the scene just in case.
-
-        MaybeSpawnAGhoul();
+        //SetGameState_Setup0();
+        SetGameState_Playing();
 
         // Add event listeners!
         OVRManager.HMDMounted += OnGainFocus;
@@ -56,8 +55,10 @@ public class GameController : MonoBehaviour {
     void OnGainFocus() { OnApplicationFocus(true); }
     void OnLoseFocus() { OnApplicationFocus(false); }
     private void OnApplicationFocus(bool _hasFocus) {
+#if !UNITY_EDITOR
         applicationHasFocus = _hasFocus;
         UpdateTimeScale();
+#endif
     }
     private void OnApplicationPause(bool _pauseStatus) {
         applicationHasFocus = !_pauseStatus; // we DO have focus if it's NOT paused. For mobile. TODO: Test this out.
@@ -69,15 +70,31 @@ public class GameController : MonoBehaviour {
     // Update
     // ----------------------------------------------------------------
     void Update() {
-        if (InputManager.Instance.GetButtonDown_Pause()) {
+        if (gameState == GameState.Playing && InputManager.Instance.GetButtonDown_Pause()) {
             TogglePause();
         }
-        if (IsPaused || IsGameOver) return; // No updates if paused, OR game over.
 
-        // Start charging beam!
-        if (MayStartChargingBeam() && InputManager.Instance.GetButtonDown_FireHeadBullet()) {
-            StartChargingBeam();
+        if (IsPaused) return; // No updates if paused.
+
+        switch (gameState) {
+            case GameState.Setup0: Update_Setup0(); break;
+            case GameState.Setup1: Update_Setup1(); break;
+            case GameState.Playing: Update_Playing(); break;
+            case GameState.GameOver: Update_GameOver(); break;
         }
+    }
+
+    private void Update_Setup0() {
+        if (InputManager.Instance.handTriggerIndexL>0.5f && InputManager.Instance.handTriggerIndexR>0.5f) {
+            SetGameState_Setup1();
+        }
+    }
+    private void Update_Setup1() {
+
+    }
+    private void Update_Playing() {
+        RegisterButtonInput();
+
         if (IsChargingBeam) {
             TimeChargingBeam += Time.deltaTime;
             if (TimeChargingBeam >= BeamChargeupDuration) {
@@ -89,6 +106,42 @@ public class GameController : MonoBehaviour {
         TimeLeft -= Time.deltaTime;
         if (TimeLeft <= 0) {
             OnTimeOver();
+        }
+    }
+    private void Update_GameOver() {
+
+    }
+
+
+    private void SetGameState_Setup0() {
+        gameHUD.UpdateTexts();
+        go_gameOverLight.SetActive(false);
+        gameHUD.gameObject.SetActive(false);
+        //ghouls = new List<Ghoul>(FindObjectsOfType<Ghoul>()); // hacky, just find all the ghouls that are already in the scene just in case.
+    }
+    private void SetGameState_Setup1() {
+        gameState = GameState.Playing;
+        playerNarration.OnSetGameState_Setup1();
+    }
+    private void SetGameState_Playing() {
+        gameState = GameState.Playing;
+        TimeLeft = TimePerRound;
+        playerNarration.OnSetGameState_Playing();
+        gameHUD.OnSetGameState_Playing();
+        MaybeSpawnAGhoul(); // this will definitely spawn a ghoul.
+    }
+    private void SetGameState_GameOver() {
+        gameState = GameState.GameOver;
+    }
+
+
+
+
+
+    private void RegisterButtonInput() {
+        // Start charging beam!
+        if (InputManager.Instance.GetButtonDown_FireHeadBullet() && MayStartChargingBeam()) {
+            StartChargingBeam();
         }
     }
 
@@ -149,6 +202,7 @@ public class GameController : MonoBehaviour {
         }
     }
 
+
     // ----------------------------------------------------------------
     // Events
     // ----------------------------------------------------------------
@@ -162,7 +216,7 @@ public class GameController : MonoBehaviour {
     }
     private void OnTimeOver() {
         TimeLeft = 0;
-        IsGameOver = true;
+        SetGameState_GameOver();
         gameHUD.OnGameOver();
         beamFireVisuals.OnGameOver();
         go_gameOverLight.SetActive(true);

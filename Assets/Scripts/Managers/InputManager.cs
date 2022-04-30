@@ -36,11 +36,11 @@ public class InputManager : MonoBehaviour {
 	public enum CursorSource { Undefined, Mouse, HandL, HandR }
 	// Constants
 	private const float DEAD_ZONE_MIN = 0.15f; // any raw axis input less than this value is set to 0. For controllers that "drift".
-	// Properties
-	float handTriggerIndexL, handTriggerIndexR; // right and left hand triggers
-	float phandTriggerIndexL, phandTriggerIndexR; // previous frame's right and left hand triggers
-	float handTriggerPointerL, handTriggerPointerR; // right and left hand triggers
-	float phandTriggerPointerL, phandTriggerPointerR; // previous frame's right and left hand triggers
+											   // Properties
+	public float handTriggerIndexL, handTriggerIndexR; // right and left hand triggers
+	float        phandTriggerIndexL, phandTriggerIndexR; // previous frame's right and left hand triggers
+	public float handTriggerPointerL, handTriggerPointerR; // right and left hand triggers
+	float        phandTriggerPointerL, phandTriggerPointerR; // previous frame's right and left hand triggers
 	private bool isButtonDown_AdvanceLocksteps;
 	private bool isButtonDown_PullObedients;
 	public Collider CurrCursorCollider { get; private set; }
@@ -107,7 +107,7 @@ public class InputManager : MonoBehaviour {
         if (OVRInput.GetDown(OVRInput.Button.Four)) return true;
         return false;
     }
-    public bool GetButtonDown_ToggleGameplayDebugUI() {
+    public bool GetButtonDown_ResetOrientation() {
 		if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.D)) return true;
 		if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick)) return true; // left controller thumbstick click
 		if (OVRInput.GetDown(OVRInput.Button.SecondaryThumbstick)) return true; // right controller thumbstick click
