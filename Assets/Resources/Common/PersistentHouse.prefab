@@ -226,7 +226,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   go_CubeLine: {fileID: 7050543406454011410, guid: 8e07914cb3d49034cb68cc078b21d093, type: 3}
-  go_Gem: {fileID: 1591165099382186, guid: e225c46f49f2ca840b6fd861da022d60, type: 3}
+  Bullet: {fileID: 3041432903595747833, guid: 1cbd0f593a16a3d41b100795cdc5bda7, type: 3}
+  Ghoul: {fileID: 6511622798498742989, guid: 82ccbf65da87fce478ad9589fea4bfb2, type: 3}
 --- !u!1 &7657131614608522446
 GameObject:
   m_ObjectHideFlags: 0

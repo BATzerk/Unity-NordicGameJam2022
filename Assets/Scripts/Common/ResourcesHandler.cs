@@ -33,6 +33,7 @@ public class ResourcesHandler : MonoBehaviour {
 	// Common
 	[SerializeField] public GameObject go_CubeLine;
 	// References
-	[SerializeField] public GameObject go_Gem;
+	[SerializeField] public GameObject Bullet;
+	[SerializeField] public GameObject Ghoul;
 
 }

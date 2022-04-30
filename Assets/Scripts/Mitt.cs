@@ -16,10 +16,15 @@ public class Mitt : MonoBehaviour
     //  Update
     // ----------------------------------------------------------------
     private void Update() {
+        // Game over? Do nothin'.
+        if (gameController.IsGameOver) return;
+
         // How intense should we vibrate?
         float vibVol = 0; // from 0 to 1.
         bool isInAVibCore = false; // TRUE if we're RIGHT inside the vibrator! If this is true, we'll go BUMP BUMP instead of vrrrrr.
-        foreach (ProximityVibrator pv in proxVibsInRange) {
+        for (int i=proxVibsInRange.Count-1; i>=0; --i) {
+            ProximityVibrator pv = proxVibsInRange[i];
+            if (pv == null) { proxVibsInRange.RemoveAt(i); continue; } // Safety check.
             float dist = Vector3.Distance(this.transform.position, pv.transform.position);
             isInAVibCore |= dist < pv.DistMin;
             float thisVol = Mathf.InverseLerp(pv.DistMax, pv.DistMin, dist);

@@ -96,48 +96,49 @@ public class InputManager : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.Escape)) return true;
 		if (OVRInput.GetDown(OVRInput.Button.Start)) return true;
 		return false;
-	}
-	public bool GetButtonUp_ResetLevel () {
-		if (Input.GetKeyUp(KeyCode.R)) return true;
-		if (OVRInput.GetUp(OVRInput.Button.Four)) return true;
-		return false;
-	}
-	public bool GetButtonDown_ResetLevel () {
-		if (Input.GetKeyDown(KeyCode.R)) return true;
-		if (OVRInput.GetDown(OVRInput.Button.Four)) return true;
-		return false;
-	}
-	public bool GetButtonDown_ToggleGameplayDebugUI() {
+    }
+    public bool GetButtonUp_ResetLevel() {
+        if (Input.GetKeyUp(KeyCode.R)) return true;
+        if (OVRInput.GetUp(OVRInput.Button.Four)) return true;
+        return false;
+    }
+    public bool GetButtonDown_ResetLevel() {
+        if (Input.GetKeyDown(KeyCode.R)) return true;
+        if (OVRInput.GetDown(OVRInput.Button.Four)) return true;
+        return false;
+    }
+    public bool GetButtonDown_ToggleGameplayDebugUI() {
 		if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.D)) return true;
 		if (OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick)) return true; // left controller thumbstick click
 		if (OVRInput.GetDown(OVRInput.Button.SecondaryThumbstick)) return true; // right controller thumbstick click
 		return false;
     }
 
-	private bool GetButton_AdvanceLocksteps () {
-		// Hand Controllers
-		//xrHandL.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryButtonValueL);
-		//xrHandR.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryButtonValueR);
-		//if (primaryButtonValueL || primaryButtonValueR) { return true; }
-		if (OVRInput.Get(OVRInput.Button.One)
-		 || OVRInput.Get(OVRInput.Button.Two)
-		 || OVRInput.Get(OVRInput.Button.Three)
-		 || OVRInput.Get(OVRInput.Button.Four))
+	public bool GetButtonDown_FireHeadBullet() {
+		// Controller Buttons
+		if (OVRInput.GetDown(OVRInput.Button.One)
+		 || OVRInput.GetDown(OVRInput.Button.Two)
+		 || OVRInput.GetDown(OVRInput.Button.Three)
+		 || OVRInput.GetDown(OVRInput.Button.Four))
 			return true;
+		// Controller Triggers
+		if (phandTriggerIndexL<0.1f && handTriggerIndexL>=0.1f) return true;
+		if (phandTriggerIndexR<0.1f && handTriggerIndexR>=0.1f) return true;
+		if (phandTriggerPointerL<0.1f && handTriggerPointerL>=0.1f) return true;
+		if (phandTriggerPointerR<0.1f && handTriggerPointerR>=0.1f) return true;
 		// Keyboard
-		return Input.GetKey (KeyCode.LeftShift) || Input.GetKey (KeyCode.RightShift);
+		return Input.GetKeyDown(KeyCode.Space);
 	}
-	private bool GetButton_PullObedients ()	{
-		// Hand Controllers
-		if (handTriggerIndexL > 0.1f) return true;
-		if (handTriggerIndexR > 0.1f) return true;
-		xrHandL.TryGetFeatureValue(CommonUsages.trigger, out float triggerValueL);
-		xrHandR.TryGetFeatureValue(CommonUsages.trigger, out float triggerValueR);
-		if (triggerValueL>0.1f || triggerValueR>0.1f) { return true; }
-		// Keyboard
-		return Input.GetKey (KeyCode.Space);
-	}
-	public bool GetButtonDown_DropKey () { return false; } // note: disabled dropping keys.
+	//private bool GetButton_PullObedients ()	{
+	//	// Hand Controllers
+	//	if (handTriggerIndexL > 0.1f) return true;
+	//	if (handTriggerIndexR > 0.1f) return true;
+	//	xrHandL.TryGetFeatureValue(CommonUsages.trigger, out float triggerValueL);
+	//	xrHandR.TryGetFeatureValue(CommonUsages.trigger, out float triggerValueR);
+	//	if (triggerValueL>0.1f || triggerValueR>0.1f) { return true; }
+	//	// Keyboard
+	//	return Input.GetKey (KeyCode.Space);
+	//}
 
 	public int GetMouseButtonDown() {
 		if (Input.GetMouseButtonDown(0)) return 0;
