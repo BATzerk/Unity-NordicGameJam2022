@@ -7,9 +7,9 @@ public class Ghoul : MonoBehaviour
     // Components
     [SerializeField] private GameObject go_bodyVisuals;
     [SerializeField] private MeshRenderer mr_body;
-    [SerializeField] private AudioClip deathSound;
     // Properties
     [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
+    [SerializeField] private readonly float FastDriftSpeed = 0.12f; // applied to PerlinNoise
     private Vector2 boundsX = new Vector2(-0.5f, 0.5f);
     private Vector2 boundsY = new Vector2(0.5f, 1.5f);
     private Vector2 boundsZ = new Vector2(0.3f, 1.8f);
@@ -21,6 +21,8 @@ public class Ghoul : MonoBehaviour
     private float seed3;
     private float seed4;
     private float seed5;
+
+    private float speedUpTimeLeft = 0;
     // References
     [SerializeField] private Material m_slayed;
 
@@ -50,11 +52,13 @@ public class Ghoul : MonoBehaviour
         // Update position.
         if (isSlayed) {
             this.transform.position += new Vector3(0, 0.006f, 0);
-        }
-        else {
-            float xLoc = Mathf.PerlinNoise((Time.time+seed0)*DriftSpeed, (Time.time+seed1)*DriftSpeed);
-            float yLoc = Mathf.PerlinNoise((Time.time+seed2)*DriftSpeed, (Time.time+seed3)*DriftSpeed);
-            float zLoc = Mathf.PerlinNoise((Time.time+seed4)*DriftSpeed, (Time.time+seed5)*DriftSpeed);
+        } else {
+            speedUpTimeLeft = Mathf.Max(speedUpTimeLeft - Time.deltaTime, 0);
+            var speed = speedUpTimeLeft > 0 ? FastDriftSpeed : DriftSpeed;
+            
+            float xLoc = Mathf.PerlinNoise((Time.time+seed0)*speed, (Time.time+seed1)*speed);
+            float yLoc = Mathf.PerlinNoise((Time.time+seed2)*speed, (Time.time+seed3)*speed);
+            float zLoc = Mathf.PerlinNoise((Time.time+seed4)*speed, (Time.time+seed5)*speed);
             // Move around via PerlinNoise!
             this.transform.localPosition = new Vector3(
                 Mathf.Lerp(boundsX.x, boundsX.y, xLoc),
@@ -70,7 +74,6 @@ public class Ghoul : MonoBehaviour
     //  Doers
     // ----------------------------------------------------------------
     public void SlayMe() {
-        SoundController.Instance.Play(deathSound);
         isSlayed = true;
         // Disable all triggers and everything!
         foreach (Collider col in GetComponentsInChildren<Collider>()) {

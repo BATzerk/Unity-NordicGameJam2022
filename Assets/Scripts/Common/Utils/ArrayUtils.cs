@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.Common.Utils
 {
@@ -7,6 +8,11 @@ namespace Assets.Scripts.Common.Utils
         public static T RandomItem<T>(this T[] arr)
         {
             return arr[Random.Range(0, arr.Length)];
+        }
+        
+        public static T RandomItem<T>(this List<T> arr)
+        {
+            return arr[Random.Range(0, arr.Count)];
         }
     }
 }

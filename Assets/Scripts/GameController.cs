@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Assets.Scripts.Common.Utils;
 using UnityEngine;
 
 public class GameController : MonoBehaviour {
@@ -12,8 +14,11 @@ public class GameController : MonoBehaviour {
     [SerializeField] private Mitt mittL;
     [SerializeField] private Mitt mittR;
     [SerializeField] private PlayerNarration playerNarration;
-    [SerializeField] private AudioClip fireBeamSound;
-
+    [SerializeField] private AudioClip[] fireBeamSounds;
+    [SerializeField] private AudioClip[] grabSounds;
+    [SerializeField] private AudioClip[] slaySounds;
+    [SerializeField] private AudioClip[] escapeSounds;
+    
     private List<Ghoul> ghouls = new List<Ghoul>();
 
     // Properties
@@ -173,7 +178,7 @@ public class GameController : MonoBehaviour {
     RaycastHit[] hits;
     private void FireBeam() {
         // Increment NumBeamsFired.
-        SoundController.Instance.Play(fireBeamSound);
+        SoundController.Instance.PlayRandom(fireBeamSounds);
         
         NumBeamsFired++;
         IsChargingBeam = false;
@@ -192,7 +197,10 @@ public class GameController : MonoBehaviour {
             SlayGhoul(ghoulToSlay);
             Debug.Log("SLAYED ghoul!");
         }
-        else {
+        else if (ghouls.Any())
+        {
+            var aGhoul = ghouls.RandomItem();
+            SoundController.Instance.PlayRandomAt(escapeSounds, aGhoul.transform.position);
             Debug.Log("Misssed ghoul!");
         }
         
@@ -215,6 +223,7 @@ public class GameController : MonoBehaviour {
     // ----------------------------------------------------------------
     public void SlayGhoul(Ghoul ghoul) {
         // Slay ghoul!
+        SoundController.Instance.PlayRandomAt(slaySounds, ghoul.transform.position);
         ghoul.SlayMe();
         NumGhoulsCaught ++;
         gameHUD.UpdateTexts();

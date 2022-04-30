@@ -4970,6 +4970,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   go_bodyVisuals: {fileID: 6511622798753044060}
   mr_body: {fileID: 6511622798753044057}
+  deathSounds:
+  - {fileID: 8300000, guid: 07d3a23c2fae8e94695dfd8baacec27a, type: 3}
   m_slayed: {fileID: 2100000, guid: 26d57ca501335684db7455110089293f, type: 2}
 --- !u!114 &6511622798498742985
 MonoBehaviour:
