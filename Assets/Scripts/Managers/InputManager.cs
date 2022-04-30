@@ -36,11 +36,11 @@ public class InputManager : MonoBehaviour {
 	public enum CursorSource { Undefined, Mouse, HandL, HandR }
 	// Constants
 	private const float DEAD_ZONE_MIN = 0.15f; // any raw axis input less than this value is set to 0. For controllers that "drift".
-											   // Properties
+	// Properties
+	public float handTriggerGripL, handTriggerGripR; // right and left hand triggers
+	float        phandTriggerGripL, phandTriggerGripR; // previous frame's right and left hand triggers
 	public float handTriggerIndexL, handTriggerIndexR; // right and left hand triggers
 	float        phandTriggerIndexL, phandTriggerIndexR; // previous frame's right and left hand triggers
-	public float handTriggerPointerL, handTriggerPointerR; // right and left hand triggers
-	float        phandTriggerPointerL, phandTriggerPointerR; // previous frame's right and left hand triggers
 	private bool isButtonDown_AdvanceLocksteps;
 	private bool isButtonDown_PullObedients;
 	public Collider CurrCursorCollider { get; private set; }
@@ -74,13 +74,13 @@ public class InputManager : MonoBehaviour {
 
 	private bool IsAnyButtonDownOnHandL() {
 		return OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.LHand)
-			|| handTriggerIndexL > 0.1f || handTriggerPointerL > 0.1f;
+			|| handTriggerIndexL > 0.1f || handTriggerGripL > 0.1f;
 		//(OVRInput.Axis1D.PrimaryIndexTrigger, OVRInput.Controller.LTouch)
 		//	|| false;
 	}
 	private bool IsAnyButtonDownOnHandR() {
 		return OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.RHand)
-			|| handTriggerIndexR > 0.1f || handTriggerPointerR > 0.1f;
+			|| handTriggerIndexR > 0.1f || handTriggerGripR > 0.1f;
 	}
 	public bool GetButtonDown_Cancel () {
 		if (Input.GetKeyDown(KeyCode.Escape)) return true;
@@ -122,13 +122,17 @@ public class InputManager : MonoBehaviour {
 		 || OVRInput.GetDown(OVRInput.Button.Four))
 			return true;
 		// Controller Triggers
-		if (phandTriggerIndexL<0.1f && handTriggerIndexL>=0.1f) return true;
-		if (phandTriggerIndexR<0.1f && handTriggerIndexR>=0.1f) return true;
-		if (phandTriggerPointerL<0.1f && handTriggerPointerL>=0.1f) return true;
-		if (phandTriggerPointerR<0.1f && handTriggerPointerR>=0.1f) return true;
+		if (GetTriggerDown_IndexL()) return true;
+		if (GetTriggerDown_IndexR()) return true;
+		if (GetTriggerDown_PointerL()) return true;
+		if (GetTriggerDown_PointerR()) return true;
 		// Keyboard
 		return Input.GetKeyDown(KeyCode.Space);
 	}
+	public bool GetTriggerDown_IndexL() { return phandTriggerIndexL<0.1f && handTriggerIndexL>=0.1f; }
+	public bool GetTriggerDown_IndexR() { return phandTriggerIndexR<0.1f && handTriggerIndexR>=0.1f; }
+	public bool GetTriggerDown_PointerL() { return phandTriggerGripL<0.1f && handTriggerGripL>=0.1f; }
+	public bool GetTriggerDown_PointerR() { return phandTriggerGripR<0.1f && handTriggerGripR>=0.1f; }
 	//private bool GetButton_PullObedients ()	{
 	//	// Hand Controllers
 	//	if (handTriggerIndexL > 0.1f) return true;
@@ -146,8 +150,8 @@ public class InputManager : MonoBehaviour {
 		if (Input.GetMouseButtonDown(2)) return 2;
 		if (phandTriggerIndexL<0.1f && handTriggerIndexL>=0.1f) return 0;
 		if (phandTriggerIndexR<0.1f && handTriggerIndexR>=0.1f) return 0;
-		if (phandTriggerPointerL<0.1f && handTriggerPointerL>=0.1f) return 1;
-		if (phandTriggerPointerR<0.1f && handTriggerPointerR>=0.1f) return 1;
+		if (phandTriggerGripL<0.1f && handTriggerGripL>=0.1f) return 1;
+		if (phandTriggerGripR<0.1f && handTriggerGripR>=0.1f) return 1;
 		return -1;
 	}
 	public int GetMouseButtonUp() {
@@ -156,8 +160,8 @@ public class InputManager : MonoBehaviour {
 		if (Input.GetMouseButtonUp(2)) return 2;
 		if (phandTriggerIndexL>=0.1f && handTriggerIndexL<0.1f) return 0;
 		if (phandTriggerIndexR>=0.1f && handTriggerIndexR<0.1f) return 0;
-		if (phandTriggerPointerL>=0.1f && handTriggerPointerL<0.1f) return 1;
-		if (phandTriggerPointerR>=0.1f && handTriggerPointerR<0.1f) return 1;
+		if (phandTriggerGripL>=0.1f && handTriggerGripL<0.1f) return 1;
+		if (phandTriggerGripR>=0.1f && handTriggerGripR<0.1f) return 1;
 		return -1;
 	}
 	public int GetMouseButton() {
@@ -166,8 +170,8 @@ public class InputManager : MonoBehaviour {
 		if (Input.GetMouseButton(2)) return 2;
 		if (handTriggerIndexL>0.1f) return 0;
 		if (handTriggerIndexR>0.1f) return 0;
-		if (handTriggerPointerL>0.1f) return 1;
-		if (handTriggerPointerR>0.1f) return 1;
+		if (handTriggerGripL>0.1f) return 1;
+		if (handTriggerGripR>0.1f) return 1;
 		return -1;
 	}
 
@@ -208,14 +212,14 @@ public class InputManager : MonoBehaviour {
 
 	private void UpdateButtons () {
 		// Update OVR controller triggers
+		phandTriggerGripL = handTriggerGripL;
+		phandTriggerGripR = handTriggerGripR;
 		phandTriggerIndexL = handTriggerIndexL;
 		phandTriggerIndexR = handTriggerIndexR;
-		phandTriggerPointerL = handTriggerPointerL;
-		phandTriggerPointerR = handTriggerPointerR;
+		handTriggerGripL = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.LTouch);
+		handTriggerGripR = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.RTouch);
 		handTriggerIndexL = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, OVRInput.Controller.LTouch);
 		handTriggerIndexR = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, OVRInput.Controller.RTouch);
-		handTriggerPointerL = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.LTouch);
-		handTriggerPointerR = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.RTouch);
 	}
 	private void UpdateMovementAxis () {
 		movementAxis = Vector2.zero;
