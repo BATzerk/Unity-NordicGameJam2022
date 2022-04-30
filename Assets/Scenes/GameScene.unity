@@ -14491,7 +14491,8 @@ MonoBehaviour:
   mittL: {fileID: 656653896}
   gunR: {fileID: 647362628}
   playerNarration: {fileID: 996702096}
-  fireBeamSounds: []
+  fireBeamSounds:
+  - {fileID: 8300000, guid: 5d9876212dcdfff4cb65645f2a7f05de, type: 3}
   grabSounds:
   - {fileID: 8300000, guid: b8306b9407a7164479a45f3344538bab, type: 3}
   - {fileID: 8300000, guid: 6cdbeed2f691cad40b1ccfce155321a6, type: 3}

@@ -159,6 +159,7 @@ public class GameController : MonoBehaviour {
     private void StartChargingBeam() {
         // HACK! Note: poorly worded functions. #gamejam
         beamFireVisuals.OnStartChargingBeam();
+        SoundController.Instance.PlayRandom(fireBeamSounds);
         IsChargingBeam = true;
         TimeChargingBeam = 0;
     }
@@ -182,7 +183,6 @@ public class GameController : MonoBehaviour {
     RaycastHit[] hits;
     private void FireBeam(Transform tf_fireSource) {
         // Increment NumBeamsFired.
-        // SoundController.Instance.PlayRandom(fireBeamSounds);
         
         NumBeamsFired++;
         IsChargingBeam = false;

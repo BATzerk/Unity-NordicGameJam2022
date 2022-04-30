@@ -51,6 +51,13 @@ public class SoundController : MonoBehaviour
         timeToNextRandomSound -= Time.deltaTime;
         if (timeToNextRandomSound < 0)
         {
+            var source = sources[sourceIndex];
+            if (source.isPlaying)
+            {
+                SetTimeToNextSound(source.clip);
+                return;
+            }
+        
             PlayRandomAt(randomSounds, RandomSourcePosition());
         }
     }
@@ -98,6 +105,7 @@ public class SoundController : MonoBehaviour
             Debug.Log("Missing sound.");
             return;
         }
+        
         var source = sources[sourceIndex];
         source.Stop();
         source.transform.position = at;
