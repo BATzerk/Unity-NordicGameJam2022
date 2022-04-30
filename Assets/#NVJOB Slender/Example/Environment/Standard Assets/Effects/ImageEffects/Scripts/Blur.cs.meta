@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: cc5a57156d784fabb22a94c54a237c4d
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - blurShader: {fileID: 4800000, guid: c89981eefdaa410387b1d5c532bfdca8, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
