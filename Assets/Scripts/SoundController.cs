@@ -1,12 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class SoundController : MonoBehaviour
 {
     // References
     [SerializeField] private AudioClip[] randomSounds;
-    [SerializeField] private AudioSource randomBackgroundSource;
+    [SerializeField] private AudioSource[] sources;
+    [SerializeField] private int sourceIndex = 0;
     [SerializeField] private float randomSoundDistance = 4;
     [SerializeField] private float randomSoundDistanceVariance = 1;
     [SerializeField] private float randomSoundMinInterval = 0.5f;
@@ -14,6 +17,8 @@ public class SoundController : MonoBehaviour
     [SerializeField] private float timeToNextRandomSound = 1;
 
     [SerializeField] private Transform listener;
+    
+    public SoundController Instrance { get; private set; }
 
     public Vector3 RandomXZCoordinate()
     {
@@ -37,6 +42,7 @@ public class SoundController : MonoBehaviour
     
     void Start()
     {
+        Instrance = this;
     }
 
     void Update()
@@ -46,13 +52,44 @@ public class SoundController : MonoBehaviour
         {
             var clipIndex = Random.Range(0, randomSounds.Length);
             var clip = randomSounds[clipIndex];
-            randomBackgroundSource.transform.position = RandomSourcePosition();
-            randomBackgroundSource.Stop();
-            randomBackgroundSource.clip = clip;
-            randomBackgroundSource.Play(0);
-            
-            // do sound
+            PlayAt(clip, RandomSourcePosition());
+        }
+    }
+
+    void SetTimeToNextSound(AudioClip clip)
+    {
+        if (sources.Length == 1)
+        {
             timeToNextRandomSound = Random.Range(Mathf.Max(randomSoundMinInterval, clip.length), Mathf.Max(randomSoundMinInterval, clip.length + 0.5f));
         }
+        else
+        {
+            timeToNextRandomSound = Random.Range(randomSoundMinInterval, randomSoundMinInterval);
+        }
+    }
+
+    void IncrementSource()
+    {
+        sourceIndex++;
+        if (sourceIndex >= sources.Length)
+        {
+            sourceIndex = 0;
+        }
+    }
+
+    void PlayAtSource(AudioClip clip)
+    {
+        PlayAt(clip, listener.position);
+    }
+    
+    void PlayAt(AudioClip clip, Vector3 at)
+    {
+        var source = sources[sourceIndex];
+        source.Stop();
+        source.transform.position = at;
+        source.clip = clip;
+        source.Play();
+        SetTimeToNextSound(clip);
+        IncrementSource();
     }
 }
