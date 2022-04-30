@@ -49,8 +49,11 @@ public class Ghoul : MonoBehaviour
             this.transform.position += new Vector3(0, 0.006f, 0);
         }
         else {
-            float currDriftTimeDelta = IsCoreTouched ? 0 : 1;
+            float driftSpeedScale = IsCoreTouched ? 0 : 1;
+            // TODO: Add slow-down here.
 
+
+            float currDriftTimeDelta = Time.deltaTime * driftSpeedScale;
             currDriftTime += Time.deltaTime * currDriftTimeDelta;
             float xLoc = Mathf.PerlinNoise((currDriftTime+seed0)*DriftSpeed, (currDriftTime+seed1)*DriftSpeed);
             float yLoc = Mathf.PerlinNoise((currDriftTime+seed2)*DriftSpeed, (currDriftTime+seed3)*DriftSpeed);

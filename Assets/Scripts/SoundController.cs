@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Common.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,7 +19,7 @@ public class SoundController : MonoBehaviour
 
     [SerializeField] private Transform listener;
     
-    public SoundController Instrance { get; private set; }
+    public static SoundController Instance { get; private set; }
 
     public Vector3 RandomXZCoordinate()
     {
@@ -42,7 +43,7 @@ public class SoundController : MonoBehaviour
     
     void Start()
     {
-        Instrance = this;
+        Instance = this;
     }
 
     void Update()
@@ -50,9 +51,7 @@ public class SoundController : MonoBehaviour
         timeToNextRandomSound -= Time.deltaTime;
         if (timeToNextRandomSound < 0)
         {
-            var clipIndex = Random.Range(0, randomSounds.Length);
-            var clip = randomSounds[clipIndex];
-            PlayAt(clip, RandomSourcePosition());
+            PlayRandomAt(randomSounds, RandomSourcePosition());
         }
     }
 
@@ -77,18 +76,33 @@ public class SoundController : MonoBehaviour
         }
     }
 
-    void PlayAtSource(AudioClip clip)
+    public void PlayRandom(AudioClip[] clips, ulong delay = 0)
     {
-        PlayAt(clip, listener.position);
+        PlayRandomAt(clips, listener.position, delay);
     }
     
-    void PlayAt(AudioClip clip, Vector3 at)
+    public void Play(AudioClip clip, ulong delay = 0)
     {
+        PlayAt(clip, listener.position, delay);
+    }
+
+    public void PlayRandomAt(AudioClip[] clips, Vector3 at, ulong delay = 0)
+    {
+        PlayAt(clips.RandomItem(), at, delay);
+    }
+
+    public void PlayAt(AudioClip clip, Vector3 at, ulong delay = 0)
+    {
+        if (clip == null)
+        {
+            Debug.Log("Missing sound.");
+            return;
+        }
         var source = sources[sourceIndex];
         source.Stop();
         source.transform.position = at;
         source.clip = clip;
-        source.Play();
+        source.Play(delay);
         SetTimeToNextSound(clip);
         IncrementSource();
     }
