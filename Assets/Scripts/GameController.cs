@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour {
     [SerializeField] private GameHUD gameHUD;
     [SerializeField] private GameObject go_gameOverLight;
     [SerializeField] private Transform tf_head; // headset.
+    [SerializeField] private Mitt mittL;
+    [SerializeField] private Mitt mittR;
     private List<Ghoul> ghouls;
     // Properties
     [SerializeField] public float TimePerRound = 91;
@@ -17,8 +19,13 @@ public class GameController : MonoBehaviour {
     public bool IsChargingBeam { get; private set; }
     public float TimeChargingBeam { get; private set; } // how long we've held down a beam charge button.
     public float TimeLeft { get; private set; }
-    private bool isPaused = false;
+    public bool IsPaused { get; private set; } = false;
     public bool IsGameOver { get; private set; } = false;
+
+    // Getters
+    private bool MayStartChargingBeam() {
+        return !IsChargingBeam && (mittL.IsTouchingVibCore || mittR.IsTouchingVibCore);
+    }
 
 
     // ----------------------------------------------------------------
@@ -27,6 +34,7 @@ public class GameController : MonoBehaviour {
     void Start() {
         TimeLeft = TimePerRound;
         gameHUD.UpdateTexts();
+        go_gameOverLight.SetActive(false);
         ghouls = new List<Ghoul>(FindObjectsOfType<Ghoul>()); // hacky, just find all the ghouls that are already in the scene just in case.
 
         MaybeSpawnAGhoul();
@@ -57,7 +65,6 @@ public class GameController : MonoBehaviour {
     }
 
 
-
     // ----------------------------------------------------------------
     // Update
     // ----------------------------------------------------------------
@@ -65,10 +72,10 @@ public class GameController : MonoBehaviour {
         if (InputManager.Instance.GetButtonDown_Pause()) {
             TogglePause();
         }
-        if (isPaused || IsGameOver) return; // No updates if paused, OR game over.
+        if (IsPaused || IsGameOver) return; // No updates if paused, OR game over.
 
         // Start charging beam!
-        if (!IsChargingBeam && InputManager.Instance.GetButtonDown_FireHeadBullet()) {
+        if (MayStartChargingBeam() && InputManager.Instance.GetButtonDown_FireHeadBullet()) {
             StartChargingBeam();
         }
         if (IsChargingBeam) {
@@ -96,11 +103,12 @@ public class GameController : MonoBehaviour {
     // Doers
     // ----------------------------------------------------------------
     private void TogglePause() {
-        isPaused = !isPaused;
+        IsPaused = !IsPaused;
         UpdateTimeScale();
+        gameHUD.UpdateTexts();
     }
     private void UpdateTimeScale() {
-        if (!applicationHasFocus || isPaused)
+        if (!applicationHasFocus || IsPaused)
             Time.timeScale = 0;
         else
             Time.timeScale = 1;
@@ -111,12 +119,11 @@ public class GameController : MonoBehaviour {
         // Increment NumBeamsFired.
         NumBeamsFired++;
         IsChargingBeam = false;
-        beamFireVisuals.OnFireBeam();
         // Raycast!
         Ghoul ghoulToSlay = null;
         hits = Physics.RaycastAll(tf_head.position, tf_head.forward);
         foreach (RaycastHit hit in hits) {
-            GhoulBody ghoulBody = hit.collider.GetComponent<GhoulBody>();
+            GhoulCore ghoulBody = hit.collider.GetComponent<GhoulCore>();
             if (ghoulBody != null) {
                 ghoulToSlay = hit.collider.GetComponentInParent<Ghoul>();
                 break;
@@ -130,6 +137,8 @@ public class GameController : MonoBehaviour {
         else {
             Debug.Log("Misssed ghoul!");
         }
+
+        beamFireVisuals.OnFireBeam(ghoulToSlay!=null);
     }
     private void MaybeSpawnAGhoul() {
         Ghoul newObj = Instantiate(ResourcesHandler.Instance.Ghoul).GetComponent<Ghoul>();

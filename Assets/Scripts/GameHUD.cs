@@ -8,6 +8,7 @@ public class GameHUD : MonoBehaviour
 {
     // Components
     [SerializeField] private GameObject go_gameOverPopup;
+    [SerializeField] private GameObject go_paused;
     [SerializeField] private TextMeshProUGUI t_timeLeft;
     [SerializeField] private TextMeshProUGUI t_numGhoulsSlayedVal;
     // References
@@ -19,6 +20,7 @@ public class GameHUD : MonoBehaviour
     // ----------------------------------------------------------------
     private void Awake() {
         go_gameOverPopup.SetActive(false);
+        go_paused.SetActive(false);
     }
 
     // ----------------------------------------------------------------
@@ -34,6 +36,7 @@ public class GameHUD : MonoBehaviour
     // ----------------------------------------------------------------
     public void UpdateTexts() {
         t_numGhoulsSlayedVal.text = gameController.NumGhoulsCaught.ToString();
+        go_paused.SetActive(gameController.IsPaused);
     }
 
     // ----------------------------------------------------------------
