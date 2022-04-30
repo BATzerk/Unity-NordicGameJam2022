@@ -10,7 +10,8 @@ public class GameController : MonoBehaviour {
     [SerializeField] private GameObject go_gameOverLight;
     [SerializeField] private Transform tf_head; // headset.
     [SerializeField] private Mitt mittL;
-    [SerializeField] private Mitt mittR;
+    //[SerializeField] private Mitt mittR;
+    [SerializeField] private Gun gunR;
     [SerializeField] private PlayerNarration playerNarration;
     private List<Ghoul> ghouls = new List<Ghoul>();
     // Properties
@@ -27,7 +28,7 @@ public class GameController : MonoBehaviour {
 
     // Getters
     private bool MayStartChargingBeam() {
-        return !IsChargingBeam && (mittL.IsTouchingVibCore || mittR.IsTouchingVibCore);
+        return !IsChargingBeam;// && (mittL.IsTouchingVibCore);// || mittR.IsTouchingVibCore);
     }
 
 
@@ -98,7 +99,7 @@ public class GameController : MonoBehaviour {
         if (IsChargingBeam) {
             TimeChargingBeam += Time.deltaTime;
             if (TimeChargingBeam >= BeamChargeupDuration) {
-                FireBeam();
+                FireBeam(gunR.transform);
             }
         }
 
@@ -114,7 +115,6 @@ public class GameController : MonoBehaviour {
 
 
     private void SetGameState_Setup0() {
-        gameHUD.UpdateTexts();
         go_gameOverLight.SetActive(false);
         gameHUD.gameObject.SetActive(false);
         //ghouls = new List<Ghoul>(FindObjectsOfType<Ghoul>()); // hacky, just find all the ghouls that are already in the scene just in case.
@@ -140,12 +140,15 @@ public class GameController : MonoBehaviour {
 
     private void RegisterButtonInput() {
         // Start charging beam!
-        if (InputManager.Instance.GetButtonDown_FireHeadBullet() && MayStartChargingBeam()) {
-            StartChargingBeam();
+        if (MayStartChargingBeam()) {
+            if (InputManager.Instance.GetTriggerDown_PointerR()) {
+                StartChargingBeam();
+            }
         }
     }
 
     private void StartChargingBeam() {
+        // HACK! Note: poorly worded functions. #gamejam
         beamFireVisuals.OnStartChargingBeam();
         IsChargingBeam = true;
         TimeChargingBeam = 0;
@@ -168,13 +171,13 @@ public class GameController : MonoBehaviour {
     }
 
     RaycastHit[] hits;
-    private void FireBeam() {
+    private void FireBeam(Transform tf_fireSource) {
         // Increment NumBeamsFired.
         NumBeamsFired++;
         IsChargingBeam = false;
         // Raycast!
         Ghoul ghoulToSlay = null;
-        hits = Physics.RaycastAll(tf_head.position, tf_head.forward);
+        hits = Physics.RaycastAll(tf_fireSource.position, tf_fireSource.forward);
         foreach (RaycastHit hit in hits) {
             GhoulCore ghoulBody = hit.collider.GetComponent<GhoulCore>();
             if (ghoulBody != null) {
