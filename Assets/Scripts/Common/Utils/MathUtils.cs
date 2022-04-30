@@ -1,0 +1,475 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public static class MathUtils {
+    // ----------------------------------------------------------------
+    //  Bools and Ints
+    // ----------------------------------------------------------------
+    public static bool RandomBool() { return Random.Range(0,1f) < 0.5f; }
+
+    static public bool IsSameSign(float a,float b) { return a*b >= 0; }
+    static public bool IsSameSign(double a,double b) { return a*b >= 0; }
+    static public int Sign(float value,bool doAllow0 = true) {
+        if (value < 0) return -1;
+        if (value > 0) return 1;
+        if (doAllow0) return 0;
+        return 1; // We can specify to prevent returning 0. Very useful for any variable with "dir" in the name.
+    }
+
+    /* Ugly code, but surprisingly faster than alternatives. */
+    static public int NumDigits(float n) {
+        n = Mathf.Abs(n);
+        if (n < 10) return 1;
+        if (n < 100) return 2;
+        if (n < 1000) return 3;
+        if (n < 10000) return 4;
+        if (n < 100000) return 5;
+        if (n < 1000000) return 6;
+        if (n < 10000000) return 7;
+        if (n < 100000000) return 8;
+        if (n < 1000000000) return 9;
+        if (n < 10000000000) return 10;
+        if (n < 100000000000) return 11;
+        if (n < 1000000000000) return 12;
+        if (n < 10000000000000) return 13;
+        if (n < 100000000000000) return 14;
+        if (n < 1000000000000000) return 15;
+        if (n < 10000000000000000) return 16;
+        if (n < 100000000000000000) return 17;
+        if (n < 1000000000000000000) return 18;
+        Debug.LogWarning("Too many digits passed into NumDigits.");
+        return 19;
+    }
+    /// Will turn numbers like 0.00008279 to a nice, fair 0!
+    static public float RoundTo2DPs(float _value) {
+        return Mathf.Round(_value * 100f) / 100f;
+    }
+    /// Will turn numbers like 0.00008279 to a nice, fair 0!
+    static public float RoundTo3DPs(float _value) {
+        return Mathf.Round(_value * 1000f) / 1000f;
+    }
+    /// Will turn numbers like 0.00008279 to a nice, fair 0!
+    static public float RoundTo4DPs(float _value) {
+        return Mathf.Round(_value * 10000f) / 10000f;
+    }
+
+    /// Maps Cos from (-1 to 1) to (0 to 1); also offsets so 0 returns 1.
+    static public float Cos01(float val) { return (1-Mathf.Sin(val)) * 0.5f; }
+    /// Maps Sin from (-1 to 1) to (0 to 1); also offsets so 0 returns 0.
+    static public float Sin01(float val) { return (1-Mathf.Cos(val)) * 0.5f; }
+    /// Maps Sin from (-1 to 1) to (a to b).
+    static public float SinRange(float a,float b,float val) { return Mathf.Lerp(a,b,Sin01(val)); }
+
+    /// For 2D grids. Converts col/row to fit into a 1D array.
+    public static int GridIndex2Dto1D(int col,int row,int numCols) { return col + row*numCols; }
+    /// For 2D grids. Converts 1D-array index to col/row.
+    public static Vector2Int GridIndex1Dto2D(int index,int numCols) { return new Vector2Int(index%numCols,Mathf.FloorToInt(index/(float)numCols)); }
+
+    /// E.g. if arrayLength is 4, we may return 2,0,3,1.
+    public static int[] GetShuffledIntArray(int arrayLength) {
+        int[] array = new int[arrayLength];
+        for (int i = 0; i<arrayLength; i++) { array[i] = i; }
+        return GetShuffledIntArray(array);
+    }
+    public static int[] GetShuffledIntArray(int[] originalArray) {
+        int[] shuffledArray = new int[originalArray.Length];
+        for (int i = 0; i<shuffledArray.Length; i++) { shuffledArray[i] = originalArray[i]; }
+        for (int i = 0; i<shuffledArray.Length; i++) {
+            int randIndex = Random.Range(0, shuffledArray.Length);
+            int valA = shuffledArray[i];
+            int valB = shuffledArray[randIndex];
+            shuffledArray[i] = valB;
+            shuffledArray[randIndex] = valA;
+        }
+        return shuffledArray;
+    }
+    public static float Map(float s, float a1, float a2, float b1, float b2) {
+        s = Mathf.Clamp(s, a1, a2);
+        float val = b1 + (s-a1)*(b2-b1)/(a2-a1);
+        return val;//Mathf.Clamp(val, b1, b2);
+    }
+    public static float MapUnclamped(float s, float a1, float a2, float b1, float b2) {
+        return b1 + (s-a1)*(b2-b1)/(a2-a1);
+    }
+
+
+
+
+    // ----------------------------------------------------------------
+    //  Vectors, Angles
+    // ----------------------------------------------------------------
+    public static readonly Vector2 Vector2NaN = new Vector2(float.NaN,float.NaN);
+    public static bool IsVector2NaN(Vector2 vector) {
+        return float.IsNaN(vector.x);
+    }
+    public static Vector2 Abs(Vector2 v) {
+        return new Vector2(Mathf.Abs(v.x), Mathf.Abs(v.y));
+    }
+    public static Vector2 Round(Vector2 v) {
+        return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
+    }
+
+    static public float GetAngleRad(Vector2 vector) { return -Mathf.Atan2 (vector.y,vector.x); } //return Mathf.Atan2(-vector.x, vector.y);
+    static public float GetAngleDeg(Vector2 vector) { return GetAngleRad(vector) * Mathf.Rad2Deg; }
+    static public float GetAngleDiffDeg(Vector2 vectorA, Vector2 vectorB) {
+        return GetAngleDiffDeg(GetAngleDeg(vectorA), GetAngleDeg(vectorB));
+    }
+	static public float GetAngleDiffRad(Vector2 vectorA, Vector2 vectorB) {
+        return GetAngleDiffRad(GetAngleRad(vectorA), GetAngleRad(vectorB));
+    }
+    static public float GetAngleDiffDeg(float angleA,float angleB) {
+        // Keep both angles between -180 and 180.
+        float difference = angleA - angleB;
+		if (difference < -180) difference += 360;
+		else if (difference > 180) difference -= 360;
+		return difference;
+	}
+	static public float GetAngleDiffRad(float angleA, float angleB) {
+		// Keep both angles between -PI and PI.
+		float difference = angleA - angleB;
+		if (difference < -Mathf.PI) difference += Mathf.PI*2;
+		else if (difference > Mathf.PI) difference -= Mathf.PI*2;
+		return difference;
+    }
+    /** If provided 90 and -85, this will return -5 as the difference. Useful to determine parallel-ness. */
+    static public float GetDifferenceBetweenAngles180Insensitive(float angleA, float angleB) {
+        float difference = GetAngleDiffDeg(angleA, angleB);
+        if (difference < -90) difference += 180;
+        else if (difference > 90) difference -= 180;
+        return difference;
+    }
+
+    public static Vector2 GetRotatedVector2Rad(Vector2 v,float radians) {
+        return GetRotatedVector2Deg(v,radians*Mathf.Rad2Deg);
+    }
+    public static Vector2 GetRotatedVector2Deg(Vector2 v,float degrees) {
+        return Quaternion.Euler(0,0,degrees) * v;
+    }
+    public static Vector3 GetRotatedVector3Deg(Vector3 v,float degrees) {
+        return Quaternion.Euler(0,0,degrees) * v;
+    }
+    /** 0 is UP, PI is LEFT. */
+    public static Vector2 GetVectorFromRad(float radians) {
+        return new Vector2(Mathf.Sin(-radians), Mathf.Cos(-radians));
+    }
+    /** 0 is UP, 90 degrees is LEFT. */
+    public static Vector2 GetVectorFromDeg(float degrees) { return GetVectorFromRad(degrees*Mathf.Deg2Rad); }
+    /** Returns a normalized vector with the provided angle. */
+    public static Vector2 GetVector2FromAngle_Radians(float radians) {
+        return new Vector2(Mathf.Cos(radians), -Mathf.Sin(radians));
+    }
+
+
+    public static Vector3 ConstantSlerp(Vector3 from,Vector3 to,float angle) {
+        float value = Mathf.Min (1, angle / Vector3.Angle(from, to));
+        return Vector3.Slerp(from,to,value);
+    }
+    public static Vector3 ProjectOntoPlane(Vector3 v,Vector3 normal) {
+        return v - Vector3.Project(v,normal);
+    }
+    /** TO DO: #optimization This function uses way overkill with converting to vectors and back. There has GOT to be a simpler way with just using the angles. */
+    public static float GetAngleReflection (float angleIn, float surfaceAngle) {
+        return 180+GetAngleDeg (Vector2.Reflect (GetVectorFromDeg(-angleIn), GetVectorFromDeg(surfaceAngle)));
+    }
+    //	public static Vector3 SnapVector3ToGrid (Vector3 _vector) { return SnapVector3ToGrid (_vector.x, _vector.y, _vector.z); }
+    static public Vector2 RoundVector2To4DPs(Vector2 _vector) { return new Vector2(RoundTo4DPs(_vector.x), RoundTo4DPs(_vector.y)); }
+    public static Vector3 RoundVector3ToInts(Vector3 _vector) { return SnapVector3ToGrid(_vector, 1); }
+    public static Vector3 SnapVector3ToGrid(Vector3 _vector, int _gridSize) {
+        return new Vector3(
+            Mathf.Round(_vector.x / _gridSize) * _gridSize,
+            Mathf.Round(_vector.y / _gridSize) * _gridSize,
+            _vector.z);
+    }
+
+    public static Vector2 PointOnCurve(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t) {
+        Vector2 ret = new Vector2();
+
+        float t2 = t * t;
+        float t3 = t2 * t;
+
+        ret.x = 0.5f * ((2.0f * p1.x) +
+        (-p0.x + p2.x) * t +
+        (2.0f * p0.x - 5.0f * p1.x + 4 * p2.x - p3.x) * t2 +
+        (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3);
+
+        ret.y = 0.5f * ((2.0f * p1.y) +
+        (-p0.y + p2.y) * t +
+        (2.0f * p0.y - 5.0f * p1.y + 4 * p2.y - p3.y) * t2 +
+        (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * t3);
+
+        return ret;
+    }
+
+
+
+    // ----------------------------------------------------------------
+    //  Vector2Int, Sides
+    // ----------------------------------------------------------------
+    public static Vector2Int GetDir(int side) {
+        switch (side) {
+            case Sides.L: return Vector2Int.L;
+            case Sides.R: return Vector2Int.R;
+            case Sides.B: return Vector2Int.B;
+            case Sides.T: return Vector2Int.T;
+            default: throw new UnityException("Whoa, " + side + " is not a valid side. Try 0, 1, 2, or 3.");
+        }
+    }
+    public static int GetSide(Vector2Int dir) {
+        if (dir == Vector2Int.L) { return Sides.L; }
+        if (dir == Vector2Int.R) { return Sides.R; }
+        if (dir == Vector2Int.T) { return Sides.T; }
+        if (dir == Vector2Int.B) { return Sides.B; }
+        Debug.LogError("Whoa, dir not convertable to side. Dir: " + dir);
+        return -1; // Whoops.
+    }
+    //public static int GetOppositeSide (Vector2Int dir) { return GetOppositeSide(GetSide(dir)); }
+    //public static int GetOppositeSide (int side) {
+    //    switch (side) {
+    //        case 0: return 2;
+    //        case 1: return 3;
+    //        case 2: return 0;
+    //        case 3: return 1;
+    //        default: throw new UnityException ("Whoa, " + side + " is not a valid side. Try 0, 1, 2, or 3.");
+    //    }
+    //}
+    public static Vector2Int GetOppositeDir(int side) { return GetDir(Sides.GetOpposite(side)); }
+    /** Just returns the original value * -1. */
+    public static Vector2Int GetOppositeDir(Vector2Int dir) { return new Vector2Int(-dir.x, -dir.y); }
+    ///** corner: 0 top-left; 1 top-right; 2 bottom-right; 3 bottom-left. */
+    //private static Vector2Int GetCornerDir (int corner) {
+    //    switch (corner) {
+    //        case 0: return new Vector2Int (-1,-1);
+    //        case 1: return new Vector2Int ( 1,-1);
+    //        case 2: return new Vector2Int ( 1, 1);
+    //        case 3: return new Vector2Int (-1, 1);
+    //        default: throw new UnityException ("Whoa, " + corner + " is not a valid corner. Try 0, 1, 2, or 3.");
+    //    }
+    //}
+    
+    
+
+
+
+    // ----------------------------------------------------------------
+    //  Rects
+    // ----------------------------------------------------------------
+    /// This much bloat is applied to EACH side of the rect. So bloat of 2 would make rect 4 units wider/taller total.
+    public static Rect BloatRect(Rect r, float bloat) {
+        r.xMin -= bloat;
+        r.xMax += bloat;
+        r.yMin -= bloat;
+        r.yMax += bloat;
+        return r;
+    }
+    /// Returns rect trimmed to fit within bounds. Like a haircut.
+    public static Rect TrimRect(Rect r, Rect bounds) {
+        if (r.xMin < bounds.xMin) { r.xMin = bounds.xMin; }
+        if (r.xMax > bounds.xMax) { r.xMax = bounds.xMax; }
+        if (r.yMin < bounds.yMin) { r.yMin = bounds.yMin; }
+        if (r.yMax > bounds.yMax) { r.yMax = bounds.yMax; }
+        return r;
+    }
+    public static Line GetRectSideLine(Rect r, int side) {
+        switch (side) {
+            case Sides.L: return new Line(r.xMin,r.yMin, r.xMin,r.yMax);
+            case Sides.R: return new Line(r.xMax,r.yMin, r.xMax,r.yMax);
+            case Sides.B: return new Line(r.xMin,r.yMin, r.xMax,r.yMin);
+            case Sides.T: return new Line(r.xMin,r.yMax, r.xMax,r.yMax);
+            default: Debug.LogWarning("Side not recognized: " + side); return new Line(); // Hmm.
+        }
+    }
+	/** easing: Higher is SLOWER. */
+	public static void EaseRect (ref Rect rect, Rect rectTarget, float easing) {
+		rect.xMin += (rectTarget.xMin-rect.xMin) / easing;
+		rect.xMax += (rectTarget.xMax-rect.xMax) / easing;
+		rect.yMin += (rectTarget.yMin-rect.yMin) / easing;
+		rect.yMax += (rectTarget.yMax-rect.yMax) / easing;
+	}
+	public static Rect LerpRect (Rect rectA, Rect rectB, float t) {
+		return new Rect (Vector2.Lerp (rectA.position,rectB.position, t), Vector2.Lerp (rectA.size,rectB.size, t));
+	}
+	public static float InverseLerpRect (Rect rectA, Rect rectB, Rect rectC) {
+		float lerpPosX = Mathf.InverseLerp (rectA.position.x, rectB.position.x, rectC.position.x);
+		float lerpPosY = Mathf.InverseLerp (rectA.position.y, rectB.position.y, rectC.position.y);
+		float lerpSizeX = Mathf.InverseLerp (rectA.size.x, rectB.size.x, rectC.size.x);
+		float lerpSizeY = Mathf.InverseLerp (rectA.size.y, rectB.size.y, rectC.size.y);
+		// Return the average of all the sides' inverse lerps!
+		float lerpAverage = (lerpPosX+lerpPosY+lerpSizeX+lerpSizeY) / 4f;
+		return lerpAverage;
+	}
+
+	public static bool AreRectsAboutEqual (Rect rectA, Rect rectB, float threshold=0.1f) {
+		return Mathf.Abs (rectA.center.x-rectB.center.x)<threshold
+			&& Mathf.Abs (rectA.center.y-rectB.center.y)<threshold
+			&& Mathf.Abs (rectA.size.x-rectB.size.x)<threshold
+			&& Mathf.Abs (rectA.size.y-rectB.size.y)<threshold;
+	}
+
+	public static void UpdateRectFromPoint(ref Rect rect, Vector2 point) {
+		if (rect.xMin > point.x) { // LEFT
+			rect.xMin = point.x;
+		}
+		if (rect.xMax < point.x) { // RIGHT
+			rect.xMax = point.x;
+		}
+		if (rect.yMin > point.y) { // TOP
+			rect.yMin = point.y;
+		}
+		if (rect.yMax < point.y) { // BOTTOM
+			rect.yMax = point.y;
+		}
+	}
+	public static Rect GetCompoundRect (Rect rectA, Rect rectB) {
+		// FIRST, check if either of these rectangles are total 0's. If one IS, we want to NOT include it in the return value, so simply return the OTHER rectangle. So we don't include the origin (0,0) accidentally.
+		if (rectA == Rect.zero) {
+			return rectB;
+		}
+		if (rectB == Rect.zero) {
+			return rectA;
+		}
+		// Otherwise, make a compound rectangle of the two :)
+		Rect returnRect = new Rect (rectA);
+		UpdateRectFromPoint (ref returnRect, rectB.max);
+		UpdateRectFromPoint (ref returnRect, rectB.min);
+		return returnRect;
+    }
+    /** We can only rotate a Rect by 90, 180, or 270 with this function. (Rects don't rotate in the first place.) */
+    public static Rect GetRotatedRect(Rect rect, float degrees) {
+        Vector2 center = GetRotatedVector3Deg(rect.center, degrees);
+        Vector2 size = rect.size;
+        if (degrees < 0) { degrees += 360; } // keep it positive, Jane.
+        if (degrees == 180) { } // 180 means leave w/h the same.
+        else if (degrees == 90 || degrees == 270) { size = new Vector2(rect.height, rect.width); }
+        else { Debug.LogWarning("Heya! We're trying to rotate a rect by NOT 90 degree increment. Degrees: " + degrees); }
+        return new Rect(center - size * 0.5f, size);
+    }
+    /** Need to squeeze a big-ass rect into a smaller one (or vice-versa!), and wanna know how to scale it? Use this function. */
+    public static float GetMinRectScale(Rect rectToScale, Rect rectToFitInto) {
+        return Mathf.Min(rectToFitInto.width / rectToScale.width, rectToFitInto.height / rectToScale.height);
+    }
+
+    /** 0 top, 1 right, 2 bottom, 3 left. E.g. If the second point is mostly to the RIGHT of the first, this'll return 1. */
+    public static int GetSideRectIsOn (Rect rectA, Rect rectB) {
+        // Because rooms aren't always perfectly in line, determine WHICH direction they're more different by. Use that.
+        // Whichever value of these is the GREATEST, that's the side rectB is on.
+        float diffL = rectA.xMin - rectB.xMax;
+        float diffR = rectB.xMin - rectA.xMax;
+        float diffB = rectA.yMin - rectB.yMax;
+        float diffT = rectB.yMin - rectA.yMax;
+        // Sort 'em!
+        float[] diffs = { diffL, diffR, diffB, diffT };
+        System.Array.Sort (diffs);
+        // WHICH is the LARGEST value??
+        float largestValue = diffs [diffs.Length - 1];
+        if (largestValue == diffL) { return Sides.L; }
+        if (largestValue == diffR) { return Sides.R; }
+        if (largestValue == diffB) { return Sides.B; }
+        if (largestValue == diffT) { return Sides.T; }
+        return -1; // impossibru!!
+    }
+    public static int GetSidePointIsOn (Rect rect, Vector2 point) {
+        // Because rooms aren't always perfectly in line, determine WHICH direction they're more different by. Use that.
+        // Whichever value of these is the GREATEST, that's the side rectB is on.
+        float diffL = rect.xMin - point.x;
+        float diffR = point.x - rect.xMax;
+        float diffB = rect.yMin - point.y;
+        float diffT = point.y - rect.yMax;
+        // Sort 'em!
+        float[] diffs = { diffL, diffR, diffB, diffT };
+        System.Array.Sort (diffs);
+        // WHICH is the LARGEST value??
+        float largestValue = diffs [diffs.Length - 1];
+        if (largestValue == diffL) { return Sides.L; }
+        if (largestValue == diffR) { return Sides.R; }
+        if (largestValue == diffB) { return Sides.B; }
+        if (largestValue == diffT) { return Sides.T; }
+        return -1; // impossibru!!
+    }
+
+    /** Rounds the x,y, and width,height of a rect to multiples of 4. So its center will DEFINITELY be even values. */
+    public static void RoundRectValuesToEvenInts(ref Rect rect) {
+        rect = new Rect(RoundToFarthestMultipleOf4(rect.x), RoundToFarthestMultipleOf4(rect.y), RoundToFarthestMultipleOf4(rect.width), RoundToFarthestMultipleOf4(rect.height));
+    }
+    /** Makes negative values MORE negative and positive values MORE positive. e.g. -2.5 will return -4, and 6.5 will return 8. */
+    public static int RoundToFarthestMultipleOf4(float value) {
+        if (value < 0) {
+            return Mathf.FloorToInt((Mathf.FloorToInt(value) / 4f)) * 4;
+        }
+        return Mathf.CeilToInt((Mathf.CeilToInt(value) / 4f)) * 4;
+    }
+  //  /** Returns a rectangle at LEAST as big as our standard dimensions (1024x768).
+	 //sourceCenterPos: The center of the 1024x768 rectangle. So we can use this function for both locally and globally positioned rectangles. */
+  //  public static Rect GetMinScreenRectangle(Rect sourceRect, Vector2 sourceCenterPos) {
+  //      return GetCompoundRect(sourceRect, new Rect(sourceCenterPos - GameVisualProperties.OriginalScreenSize * 0.5f, GameVisualProperties.OriginalScreenSize));
+  //  }
+
+
+
+    // ----------------------------------------------------------------
+    //  Ease Functions
+    // ----------------------------------------------------------------
+    /** t: current time
+	 * Default all values to going from 0 to 1.
+	 */
+    static public float EaseInQuad(float t) {
+        return t * t * t;
+    }
+    /** t: current time
+	 * Default all values to going from 0 to 1.
+	 */
+    static public float EaseInOutQuadInverse (float t) {
+		t *= 2f;
+		if (t < 1f) return Mathf.Pow (t, 1/3f) * 0.5f;
+		t -= 2f;
+		t *= -1f;
+		return 1f - Mathf.Pow (t, 1/3f) * 0.5f;
+	}
+	
+	/** t: current time
+	 * Default all values to going from 0 to 1.
+	 */
+	static public float EaseInOutQuad (float t) {
+		//		return EaseInOutQuad (t, 0,1,1);
+		t *= 2f;
+		if (t < 1f) return t*t*t * 0.5f;
+		t -= 2f;
+		return 1f + t*t*t * 0.5f;
+	}
+	/** t: current time
+	 *  b: start value
+	 *  c: change in value
+	 *  d: duration
+	 * */
+	static public float EaseInOutQuad (float t, float b, float c, float d) {
+		t /= d/2f;
+		if (t < 1f) return c/2f*t*t*t + b;
+		t -= 2f;
+		return -c/2f * (t*t*t - 2f) + b;
+	}
+	
+	/** t: current time
+	 * Default all values to going from 0 to 1.
+	 */
+	static public float EaseInOutQuart (float t) {
+		return EaseInOutQuart (t, 0,1,1);
+	}
+	/** t: current time
+	 *  b: start value
+	 *  c: change in value
+	 *  d: duration
+	 * */
+	static public float EaseInOutQuart (float t, float b, float c, float d) {
+		t /= d/2f;
+		if (t < 1f) return c/2f*t*t*t*t + b;
+		t -= 2f;
+		return -c/2f * (t*t*t*t - 2f) + b;
+	}
+
+
+
+}
+
+
+
+
