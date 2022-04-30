@@ -9,6 +9,7 @@ public class Ghoul : MonoBehaviour
     [SerializeField] private MeshRenderer mr_body;
     // Properties
     [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
+    [SerializeField] private readonly float SpeedUpMultiplier = 3f; // applied to PerlinNoise
     private Vector2 boundsX = new Vector2(-0.5f, 0.5f);
     private Vector2 boundsY = new Vector2(0.5f, 1.5f);
     private Vector2 boundsZ = new Vector2(0.3f, 1.8f);
@@ -17,6 +18,8 @@ public class Ghoul : MonoBehaviour
     public bool IsCoreTouched=false;// { get; private set; } = false; // currently touched.
     private float currDriftTime; // incremented every frame. Can be slowed or sped up.
     private float seed0, seed1, seed2, seed3, seed4, seed5;
+
+    public float SpeedUpTimeLeft = 0f;
     // References
     [SerializeField] private Material m_slayed;
 
@@ -49,10 +52,8 @@ public class Ghoul : MonoBehaviour
             this.transform.position += new Vector3(0, 0.006f, 0);
         }
         else {
-            float driftSpeedScale = IsCoreTouched ? 0 : 1;
-            // TODO: Add slow-down here.
-
-
+            SpeedUpTimeLeft = Mathf.Max(SpeedUpTimeLeft - Time.deltaTime, 0);
+            float driftSpeedScale = SpeedUpTimeLeft > 0 ? SpeedUpMultiplier : (IsCoreTouched ? 0 : 1);
             float currDriftTimeDelta = Time.deltaTime * driftSpeedScale;
             currDriftTime += Time.deltaTime * currDriftTimeDelta;
             float xLoc = Mathf.PerlinNoise((currDriftTime+seed0)*DriftSpeed, (currDriftTime+seed1)*DriftSpeed);

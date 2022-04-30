@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour {
     [SerializeField] private AudioClip[] grabSounds;
     [SerializeField] private AudioClip[] slaySounds;
     [SerializeField] private AudioClip[] escapeSounds;
+    [SerializeField] private float ghoulSpeedUpTime;
     
     private List<Ghoul> ghouls = new List<Ghoul>();
 
@@ -149,7 +150,7 @@ public class GameController : MonoBehaviour {
     private void RegisterButtonInput() {
         // Start charging beam!
         if (MayStartChargingBeam()) {
-            if (InputManager.Instance.GetTriggerDown_PointerR()) {
+            if (InputManager.Instance.GetTriggerDown_PointerR() || Input.GetKeyDown(KeyCode.F)) {
                 StartChargingBeam();
             }
         }
@@ -181,7 +182,7 @@ public class GameController : MonoBehaviour {
     RaycastHit[] hits;
     private void FireBeam(Transform tf_fireSource) {
         // Increment NumBeamsFired.
-        SoundController.Instance.PlayRandom(fireBeamSounds);
+        // SoundController.Instance.PlayRandom(fireBeamSounds);
         
         NumBeamsFired++;
         IsChargingBeam = false;
@@ -202,6 +203,10 @@ public class GameController : MonoBehaviour {
         }
         else if (ghouls.Any())
         {
+            foreach (var ghoul in ghouls)
+            {
+                ghoul.SpeedUpTimeLeft = ghoulSpeedUpTime;
+            }
             var aGhoul = ghouls.RandomItem();
             SoundController.Instance.PlayRandomAt(escapeSounds, aGhoul.transform.position);
             Debug.Log("Misssed ghoul!");
