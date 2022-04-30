@@ -7,6 +7,7 @@ public class Ghoul : MonoBehaviour
     // Components
     [SerializeField] private GameObject go_bodyVisuals;
     [SerializeField] private MeshRenderer mr_body;
+    [SerializeField] private AudioClip deathSound;
     // Properties
     [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
     private Vector2 boundsX = new Vector2(-0.5f, 0.5f);
@@ -69,6 +70,7 @@ public class Ghoul : MonoBehaviour
     //  Doers
     // ----------------------------------------------------------------
     public void SlayMe() {
+        SoundController.Instance.Play(deathSound);
         isSlayed = true;
         // Disable all triggers and everything!
         foreach (Collider col in GetComponentsInChildren<Collider>()) {

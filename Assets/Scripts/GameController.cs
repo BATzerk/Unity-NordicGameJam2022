@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour {
     [SerializeField] private Transform tf_head; // headset.
     [SerializeField] private Mitt mittL;
     [SerializeField] private Mitt mittR;
+    [SerializeField] private AudioClip fireBeamSound;
     private List<Ghoul> ghouls;
     // Properties
     [SerializeField] public float TimePerRound = 91;
@@ -117,6 +118,8 @@ public class GameController : MonoBehaviour {
     RaycastHit[] hits;
     private void FireBeam() {
         // Increment NumBeamsFired.
+        SoundController.Instance.Play(fireBeamSound);
+        
         NumBeamsFired++;
         IsChargingBeam = false;
         // Raycast!
@@ -137,6 +140,8 @@ public class GameController : MonoBehaviour {
         else {
             Debug.Log("Misssed ghoul!");
         }
+        
+        //speed up ghosts on miss
 
         beamFireVisuals.OnFireBeam(ghoulToSlay!=null);
     }
