@@ -10,7 +10,7 @@ public class GameHUD : MonoBehaviour
     [SerializeField] private GameOverPopup gameOverPopup;
     [SerializeField] private GameObject go_paused;
     [SerializeField] private GameObject go_startPlayingInstructions;
-    [SerializeField] private GameObject go_timeLeft;
+    [SerializeField] private GameObject go_playingTexts;
     [SerializeField] private TextMeshProUGUI t_timeLeft;
     [SerializeField] private TextMeshProUGUI t_numGhoulsSlainLVal;
     [SerializeField] private TextMeshProUGUI t_numGhoulsSlainRVal;
@@ -50,7 +50,7 @@ public class GameHUD : MonoBehaviour
     // ----------------------------------------------------------------
     public void OnSetGameState(GameController.GameState state) {
         // Hide things by default.
-        go_timeLeft.SetActive(false);
+        go_playingTexts.SetActive(false);
         go_startPlayingInstructions.SetActive(false);
         gameOverPopup.Hide();
 
@@ -61,7 +61,7 @@ public class GameHUD : MonoBehaviour
                 break;
             case GameController.GameState.Playing:
                 UpdateTexts();
-                go_timeLeft.SetActive(true);
+                go_playingTexts.SetActive(true);
                 break;
             case GameController.GameState.GameOver:
                 gameOverPopup.Show();

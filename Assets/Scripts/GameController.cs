@@ -128,7 +128,6 @@ public class GameController : MonoBehaviour {
         switch (gameState) {
             case GameState.Setup0:
                 go_gameOverLight.SetActive(false);
-                gameHUD.gameObject.SetActive(false);
                 break;
             case GameState.Setup1:
                 playerNarration.OnSetGameState_Setup1();
@@ -148,6 +147,9 @@ public class GameController : MonoBehaviour {
         }
         // Tell the HUD!
         gameHUD.OnSetGameState(gameState);
+    }
+    private void OnPrePlayCountdownDone() {
+        SetGameState(GameState.Playing);
     }
 
 
