@@ -13,13 +13,11 @@ public class GameController : MonoBehaviour {
     [SerializeField] private Mitt mittL;
     [SerializeField] private Mitt mittR;
     [SerializeField] private PlayerNarration playerNarration;
-    [SerializeField] private AudioClip[] fireBeamSounds;
     [SerializeField] private AudioClip[] grabSounds;
     [SerializeField] private AudioClip[] slaySounds;
     [SerializeField] private AudioClip[] escapeSounds;
     [SerializeField] private AudioClip clip_correctChime;
     [SerializeField] private AudioClip clip_prePlayCountdown;
-    [SerializeField] private AudioClip gameplayCountdown;
     [SerializeField] private float ghoulSpeedUpTime;
     private List<Ghoul> ghouls = new List<Ghoul>();
 

@@ -882,12 +882,22 @@ MonoBehaviour:
   - {fileID: 8300000, guid: ea25b92aa992e3243b7be02184e02af1, type: 3}
   - {fileID: 8300000, guid: 38f1282b67c53e84b9dfb019a5f2e129, type: 3}
   - {fileID: 8300000, guid: fc614011533fa344980a6827614385de, type: 3}
-  - {fileID: 8300000, guid: 0b9fa0980e063a642ad6680c80bf08e1, type: 3}
+  - {fileID: 8300000, guid: d107cf2d025d2f34489f46e59b2fdb71, type: 3}
+  - {fileID: 8300000, guid: ac97eaf72fb4dfa478739305f2574b8a, type: 3}
+  - {fileID: 8300000, guid: 1da34f34e79c5b54eb636e9304b9ee96, type: 3}
+  - {fileID: 8300000, guid: 3416427fe5c210e45b8d5eb71dd0d662, type: 3}
+  - {fileID: 8300000, guid: ec6eeefb6718e264893aeb36560c2884, type: 3}
+  - {fileID: 8300000, guid: ff4c64e9b73a4244287017d1a90b3697, type: 3}
+  - {fileID: 8300000, guid: d18ab6ca20d256c4f8152f0b807e96de, type: 3}
+  - {fileID: 8300000, guid: 78b5f4f1dec82d244ba142f2851706ab, type: 3}
+  - {fileID: 8300000, guid: a992e5c3e96c6594baf0f4f21344120b, type: 3}
+  - {fileID: 8300000, guid: e2a8341af96d57a4abbc34a358048292, type: 3}
+  - {fileID: 8300000, guid: 1acebd5077b3d7c409a48b3e18a90b48, type: 3}
   sourceIndex: 0
   randomSoundDistance: 4
   randomSoundDistanceVariance: 1
-  randomSoundMinInterval: 0.5
-  randomSoundMaxInterval: 5
+  randomSoundMinInterval: 4
+  randomSoundMaxInterval: 7
   timeToNextRandomSound: 1
   listener: {fileID: 4636974642786108196}
 --- !u!4 &383294151
@@ -15477,20 +15487,21 @@ MonoBehaviour:
   mittL: {fileID: 656653896}
   mittR: {fileID: 397690784}
   playerNarration: {fileID: 996702096}
-  fireBeamSounds:
-  - {fileID: 8300000, guid: 5d9876212dcdfff4cb65645f2a7f05de, type: 3}
   grabSounds:
   - {fileID: 8300000, guid: b8306b9407a7164479a45f3344538bab, type: 3}
   - {fileID: 8300000, guid: 6cdbeed2f691cad40b1ccfce155321a6, type: 3}
   slaySounds:
   - {fileID: 8300000, guid: 07d3a23c2fae8e94695dfd8baacec27a, type: 3}
+  - {fileID: 8300000, guid: 07d3a23c2fae8e94695dfd8baacec27a, type: 3}
   escapeSounds:
-  - {fileID: 8300000, guid: 3514725147843a740bb22ca96f4631e8, type: 3}
-  - {fileID: 8300000, guid: 1a0e2efc49990184588aeb6d8d324a2e, type: 3}
-  - {fileID: 8300000, guid: 342ec8f9fec7d40438c7b6d33b2f521a, type: 3}
+  - {fileID: 8300000, guid: 86a647c67b1ea0943ac1ebdf5fa42de1, type: 3}
+  - {fileID: 8300000, guid: 709266833ebe8234bbf2c0b7d263e978, type: 3}
+  - {fileID: 8300000, guid: 9e99d0e1b01a6544fa7852ce94d2a5d7, type: 3}
+  - {fileID: 8300000, guid: c56e4ff8c2a961741a3a55458be12c96, type: 3}
+  - {fileID: 8300000, guid: b3f2bd18432a9784d946d6391bc680a3, type: 3}
+  - {fileID: 8300000, guid: 961986dab1af9d24ea0266cd623b098e, type: 3}
   clip_correctChime: {fileID: 8300000, guid: cfe00fb450c70b04bbb1391f3100c297, type: 3}
-  clip_prePlayCountdown: {fileID: 0}
-  gameplayCountdown: {fileID: 0}
+  clip_prePlayCountdown: {fileID: 8300000, guid: 0a4283fa5b58c6241991da183408d5ff, type: 3}
   ghoulSpeedUpTime: 1.5
   TimePerRound: 91
 --- !u!114 &1853407691
