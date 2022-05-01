@@ -108,7 +108,7 @@ public class SoundController : MonoBehaviour
         PlayAt(clips.RandomItem(), at, delay);
     }
 
-    public void PlayAt(AudioClip clip, Vector3 at, ulong delay = 0)
+    public void PlayAt(AudioClip clip, Vector3 at, ulong delay = 0, bool is3D = false)
     {
         if (clip == null)
         {
@@ -120,8 +120,19 @@ public class SoundController : MonoBehaviour
         source.Stop();
         source.transform.position = at;
         source.clip = clip;
+        source.spatialBlend = is3D ? 1 : 0;
         source.Play(delay);
         SetTimeToNextSound(clip);
         IncrementSource();
+    }
+
+
+    public void OnSetGameState(GameController.GameState state) {
+        if (state == GameController.GameState.Playing) {
+            timeToNextRandomSound = 0; // play one right away!
+        }
+        else {
+            timeToNextRandomSound = 999999; // HACK don't play any sounds if it's not gameplay.
+        }
     }
 }

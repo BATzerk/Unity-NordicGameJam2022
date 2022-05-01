@@ -8,7 +8,7 @@ public class GameController : MonoBehaviour {
     public enum GameState { Undefined, Setup0, Setup1, PrePlayCountdown, Playing, GameOver }
     // References
     [SerializeField] private GameHUD gameHUD;
-    [SerializeField] private GameObject go_gameOverLight;
+    [SerializeField] private GameObject go_houseLights;
     [SerializeField] private Transform tf_head; // headset.
     [SerializeField] private Mitt mittL;
     [SerializeField] private Mitt mittR;
@@ -81,6 +81,9 @@ public class GameController : MonoBehaviour {
     // Update
     // ----------------------------------------------------------------
     void Update() {
+        if (Input.GetKeyDown(KeyCode.S)) {
+			ScreenCapture.CaptureScreenshot("screen.png");
+		}
         if (gameState == GameState.Playing && InputManager.Instance.GetButtonDown_Pause()) {
             TogglePause();
         }
@@ -115,7 +118,7 @@ public class GameController : MonoBehaviour {
         // Countdown!
         TimeLeft -= Time.deltaTime;
         if (TimeLeft <= 0) {
-            OnTimeOver();
+            SetGameState(GameState.GameOver);
         }
     }
     private void Update_GameOver() {
@@ -129,26 +132,32 @@ public class GameController : MonoBehaviour {
         gameState = state;
         switch (gameState) {
             case GameState.Setup0:
-                go_gameOverLight.SetActive(false);
+                go_houseLights.SetActive(true);
                 break;
             case GameState.Setup1:
+                go_houseLights.SetActive(true);
                 playerNarration.OnSetGameState_Setup1();
                 break;
             case GameState.PrePlayCountdown:
-                SoundController.Instance.Play(clip_prePlayCountdown);
+                go_houseLights.SetActive(true);
+                SoundController.Instance.PlayAt(clip_prePlayCountdown, Vector3.zero, 0, false);
                 Invoke("OnPrePlayCountdownDone", 3);
                 break;
             case GameState.Playing:
+                go_houseLights.SetActive(false);
                 TimeLeft = TimePerRound;
                 playerNarration.OnSetGameState_Playing();
                 MaybeSpawnAGhoul(); // this will definitely spawn a ghoul.
                 break;
             case GameState.GameOver:
+                TimeLeft = 0;
+                go_houseLights.SetActive(true);
                 gameState = GameState.GameOver;
                 break;
         }
-        // Tell the HUD!
+        // Tell folks!
         gameHUD.OnSetGameState(gameState);
+        SoundController.Instance.OnSetGameState(gameState);
     }
     private void OnPrePlayCountdownDone() {
         SetGameState(GameState.Playing);
@@ -159,10 +168,10 @@ public class GameController : MonoBehaviour {
 
 
     private void RegisterButtonInput() {
-        if (mittL.IsTouchingCore && InputManager.Instance.GetButtonDown_FireGunL()) {
+        if (InputManager.Instance.GetButtonDown_FireGunL()) { //mittL.IsTouchingCore && 
             FireGunL();
         }
-        if (mittR.IsTouchingCore && InputManager.Instance.GetButtonDown_FireGunR()) {
+        if (InputManager.Instance.GetButtonDown_FireGunR()) {//mittR.IsTouchingCore && 
             FireGunR();
         }
     }
@@ -243,11 +252,6 @@ public class GameController : MonoBehaviour {
     }
 
 
-    private void OnTimeOver() {
-        TimeLeft = 0;
-        SetGameState(GameState.GameOver);
-        go_gameOverLight.SetActive(true);
-    }
     public void OnGhoulDestroyed(Ghoul ghoul) {
         ghouls.Remove(ghoul);
     }
