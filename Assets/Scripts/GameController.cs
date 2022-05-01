@@ -86,6 +86,10 @@ public class GameController : MonoBehaviour {
         if (gameState == GameState.Playing && InputManager.Instance.GetButtonDown_Pause()) {
             TogglePause();
         }
+        if (Input.GetKeyDown(KeyCode.Return)) {
+            SceneHelper.ReloadScene();
+            return;
+        }
 
         if (IsPaused) return; // No updates if paused.
 

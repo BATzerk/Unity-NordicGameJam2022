@@ -6,7 +6,8 @@ public class Ghoul : MonoBehaviour
 {
     // Components
     [SerializeField] private GameObject go_bodyVisuals;
-    [SerializeField] private MeshRenderer mr_body;
+    //[SerializeField] private MeshRenderer mr_body;
+    [SerializeField] private SpriteRenderer sr_face;
     // Properties
     [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
     [SerializeField] private readonly float SpeedUpMultiplier = 3f; // applied to PerlinNoise
@@ -42,6 +43,9 @@ public class Ghoul : MonoBehaviour
 
         // Start hidden.
         go_bodyVisuals.SetActive(false);
+        // Set face sprite!
+        Sprite[] faceSpriteOptions = Resources.LoadAll<Sprite>("GhoulImages/");
+        sr_face.sprite = faceSpriteOptions[Random.Range(0, faceSpriteOptions.Length-1)];
     }
     private void DestroySelf() {
         gameController.OnGhoulDestroyed(this);
@@ -86,8 +90,9 @@ public class Ghoul : MonoBehaviour
             col.enabled = false;
         }
         // Change my material and gtfo!
-        mr_body.enabled = true;
-        mr_body.material = m_slayed;
+        //mr_body.enabled = true;
+        //mr_body.material = m_slayed;
+        sr_face.color = new Color(0.1f,1f,0f, 0.4f);
         Invoke("DestroySelf", 1.5f);
     }
     public void SetIsFoundTrue() {
