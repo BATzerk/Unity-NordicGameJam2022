@@ -16,8 +16,12 @@ public class GameController : MonoBehaviour {
     [SerializeField] private AudioClip[] grabSounds;
     [SerializeField] private AudioClip[] slaySounds;
     [SerializeField] private AudioClip[] escapeSounds;
-    [SerializeField] private AudioClip clip_correctChime;
+    [SerializeField] private AudioClip clip_correctChimeL;
+    [SerializeField] private AudioClip clip_correctChimeR;
     [SerializeField] private AudioClip clip_prePlayCountdown;
+    [SerializeField] private AudioClip clip_winnerL;
+    [SerializeField] private AudioClip clip_winnerR;
+    [SerializeField] private AudioClip clip_winnerTie;
     [SerializeField] private float ghoulSpeedUpTime;
     private List<Ghoul> ghouls = new List<Ghoul>();
 
@@ -83,7 +87,10 @@ public class GameController : MonoBehaviour {
     void Update() {
         if (Input.GetKeyDown(KeyCode.S)) {
 			ScreenCapture.CaptureScreenshot("screen.png");
-		}
+        }
+        if (Input.GetKeyDown(KeyCode.E)) { // E to end the round.
+            TimeLeft = 5;
+        }
         if (gameState == GameState.Playing && InputManager.Instance.GetButtonDown_Pause()) {
             TogglePause();
         }
@@ -152,7 +159,7 @@ public class GameController : MonoBehaviour {
             case GameState.GameOver:
                 TimeLeft = 0;
                 go_houseLights.SetActive(true);
-                gameState = GameState.GameOver;
+                PlayWinnerSound();
                 break;
         }
         // Tell folks!
@@ -161,6 +168,14 @@ public class GameController : MonoBehaviour {
     }
     private void OnPrePlayCountdownDone() {
         SetGameState(GameState.Playing);
+    }
+
+    private void PlayWinnerSound() {
+        AudioClip clip;
+        if (NumGhoulsSlainL == NumGhoulsSlainR) clip = clip_winnerTie;
+        else if (NumGhoulsSlainL > NumGhoulsSlainR) clip = clip_winnerL;
+        else clip = clip_winnerR;
+        SoundController.Instance.Play(clip, 1);
     }
 
 
@@ -186,7 +201,7 @@ public class GameController : MonoBehaviour {
 
     private void FireGunL() {
         Ghoul ghoulToSlay = GetGhoulAtPos(mittL.transform.position);
-        mittL.OnFireGun(ghoulToSlay == null);
+        mittL.OnFireGun(ghoulToSlay != null);
         // Slay or Miss!
         if (ghoulToSlay != null) {
             SlayGhoulL(ghoulToSlay);
@@ -197,7 +212,7 @@ public class GameController : MonoBehaviour {
     }
     private void FireGunR() {
         Ghoul ghoulToSlay = GetGhoulAtPos(mittR.transform.position);
-        mittR.OnFireGun(ghoulToSlay == null);
+        mittR.OnFireGun(ghoulToSlay != null);
         // Slay or Miss!
         if (ghoulToSlay != null) {
             SlayGhoulR(ghoulToSlay);
@@ -238,15 +253,16 @@ public class GameController : MonoBehaviour {
     // ----------------------------------------------------------------
     private void SlayGhoulL(Ghoul ghoul) {
         NumGhoulsSlainL++;
+        SoundController.Instance.PlayAt(clip_correctChimeL, ghoul.transform.position);
         OnEitherPlayerSlayGhoul(ghoul);
     }
     private void SlayGhoulR(Ghoul ghoul) {
         NumGhoulsSlainR++;
+        SoundController.Instance.PlayAt(clip_correctChimeR, ghoul.transform.position);
         OnEitherPlayerSlayGhoul(ghoul);
     }
     private void OnEitherPlayerSlayGhoul(Ghoul ghoul) {
         SoundController.Instance.PlayRandomAt(slaySounds, ghoul.transform.position);
-        SoundController.Instance.PlayAt(clip_correctChime, ghoul.transform.position);
         ghoul.SlayMe();
         gameHUD.UpdateTexts();
     }

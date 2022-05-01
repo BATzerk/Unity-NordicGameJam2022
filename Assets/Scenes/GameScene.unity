@@ -15738,8 +15738,21 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b8306b9407a7164479a45f3344538bab, type: 3}
   - {fileID: 8300000, guid: 6cdbeed2f691cad40b1ccfce155321a6, type: 3}
   slaySounds:
-  - {fileID: 8300000, guid: 07d3a23c2fae8e94695dfd8baacec27a, type: 3}
-  - {fileID: 8300000, guid: 07d3a23c2fae8e94695dfd8baacec27a, type: 3}
+  - {fileID: 8300000, guid: 2c8d9e2a30cc953458db23bfe21c78e5, type: 3}
+  - {fileID: 8300000, guid: 1d4a05360ecce8b4ab84823f1ea4ebcf, type: 3}
+  - {fileID: 8300000, guid: 3aebf7a361b819a44b298a6386f615db, type: 3}
+  - {fileID: 8300000, guid: f6fb47eacde177844a265f9f81eae8cb, type: 3}
+  - {fileID: 8300000, guid: f070dd1be3d6a2f47985b4d9421d61ec, type: 3}
+  - {fileID: 8300000, guid: c680618f487a67d429b272290e9e818e, type: 3}
+  - {fileID: 8300000, guid: 4cb4d45377902a94099eaa13008e278e, type: 3}
+  - {fileID: 8300000, guid: a68b7948b7b04bf4a8fba420b0a95d69, type: 3}
+  - {fileID: 8300000, guid: 9af3d127fda419e488077466d382dc22, type: 3}
+  - {fileID: 8300000, guid: 639506fc9b1d89d47a984fd91663e22b, type: 3}
+  - {fileID: 8300000, guid: b3498c9d420335f4cb49b0d114e33f58, type: 3}
+  - {fileID: 8300000, guid: ff6f180434a0c634ab1067a6188b3653, type: 3}
+  - {fileID: 8300000, guid: d77140f91be94fa46b64b4a145412ac5, type: 3}
+  - {fileID: 8300000, guid: 75a8cc93dc700764bb8f288653e40b65, type: 3}
+  - {fileID: 8300000, guid: b6bf79a3ead6e0f4282b1700184513fe, type: 3}
   escapeSounds:
   - {fileID: 8300000, guid: 86a647c67b1ea0943ac1ebdf5fa42de1, type: 3}
   - {fileID: 8300000, guid: 709266833ebe8234bbf2c0b7d263e978, type: 3}
@@ -15747,8 +15760,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c56e4ff8c2a961741a3a55458be12c96, type: 3}
   - {fileID: 8300000, guid: b3f2bd18432a9784d946d6391bc680a3, type: 3}
   - {fileID: 8300000, guid: 961986dab1af9d24ea0266cd623b098e, type: 3}
-  clip_correctChime: {fileID: 8300000, guid: cfe00fb450c70b04bbb1391f3100c297, type: 3}
+  clip_correctChimeL: {fileID: 8300000, guid: cfe00fb450c70b04bbb1391f3100c297, type: 3}
+  clip_correctChimeR: {fileID: 8300000, guid: 0bc7d37bc42e847449b00d91b716b9f6, type: 3}
   clip_prePlayCountdown: {fileID: 8300000, guid: 0a4283fa5b58c6241991da183408d5ff, type: 3}
+  clip_winnerL: {fileID: 8300000, guid: 7d0856a2fa67ef34d942b10e6205bfc8, type: 3}
+  clip_winnerR: {fileID: 8300000, guid: 94c3744ae1f5e1f44b2f97519f67da4e, type: 3}
+  clip_winnerTie: {fileID: 8300000, guid: 65f4a08c9c88b474e83f3938554ff7c6, type: 3}
   ghoulSpeedUpTime: 1.5
   TimePerRound: 91
 --- !u!114 &1853407691

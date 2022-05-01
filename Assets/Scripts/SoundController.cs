@@ -129,7 +129,7 @@ public class SoundController : MonoBehaviour
 
     public void OnSetGameState(GameController.GameState state) {
         if (state == GameController.GameState.Playing) {
-            timeToNextRandomSound = 0; // play one right away!
+            timeToNextRandomSound = 7f; // play one in a few sex.
         }
         else {
             timeToNextRandomSound = 999999; // HACK don't play any sounds if it's not gameplay.

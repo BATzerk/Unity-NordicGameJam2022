@@ -11,6 +11,7 @@ public class Mitt : MonoBehaviour
     // Properties
     [SerializeField] private OVRInput.Controller MyHandType;
     public bool IsTouchingCore { get; private set; } // TRUE if we're RIGHT inside the vibrator! If this is true, we'll go BUMP BUMP instead of vrrrrr.
+    private float TonePitchHigh;
     // References
     [SerializeField] private GameController gameController;
     [SerializeField] private AudioSource as_tone; // looping tone.
@@ -18,12 +19,20 @@ public class Mitt : MonoBehaviour
 
 
 
+    private void Start() {
+        TonePitchHigh = MyHandType == OVRInput.Controller.LHand ? 1.8f : 2.2f;
+    }
+
+
     // ----------------------------------------------------------------
     //  Update
     // ----------------------------------------------------------------
     private void Update() {
         // Game over? Do nothin'.
-        if (gameController.IsGameOver || Time.timeScale < 0.1f) return;
+        if (gameController.IsGameOver || Time.timeScale < 0.1f) {
+            as_tone.volume = 0;
+            return;
+        }
 
         // How intense should we vibrate?
         float locToCore = 0; // from 0 to 1. 0 is far, 1 is in the core.
@@ -47,7 +56,7 @@ public class Mitt : MonoBehaviour
 
         // Hey, if we're inside a vib's core, we do a heartbeat style instead.
         if (IsTouchingCore) {
-            tonePitch = 2f;
+            tonePitch = TonePitchHigh;
             // Rhythmically disable vibration.
             if (Mathf.Sin(Time.unscaledTime*70f) > 0) {
                 vibVol = 0;
@@ -83,7 +92,7 @@ public class Mitt : MonoBehaviour
 
     public void OnFireGun(bool didSlayGhoul) {
         if (didSlayGhoul) ps_beamBurst1.Emit(120);
-        ps_beamBurst2.Emit(60);
+        ps_beamBurst2.Emit(10);
     }
 
 
