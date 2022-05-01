@@ -183,10 +183,10 @@ public class GameController : MonoBehaviour {
 
 
     private void RegisterButtonInput() {
-        if (InputManager.Instance.GetButtonDown_FireGunL()) { //mittL.IsTouchingCore && 
+        if (mittL.IsTouchingCore && InputManager.Instance.GetButtonDown_FireGunL()) { //
             FireGunL();
         }
-        if (InputManager.Instance.GetButtonDown_FireGunR()) {//mittR.IsTouchingCore && 
+        if (mittR.IsTouchingCore && InputManager.Instance.GetButtonDown_FireGunR()) {//
             FireGunR();
         }
     }
