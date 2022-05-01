@@ -22,23 +22,29 @@ public class Ghoul : MonoBehaviour
     public float SpeedUpTimeLeft = 0f;
     // References
     [SerializeField] private Material m_slayed;
+    private GameController gameController;
 
 
     // ----------------------------------------------------------------
     //  Start
     // ----------------------------------------------------------------
-    void Start() {
-        go_bodyVisuals.SetActive(false);
-        currDriftTime = Random.Range(0, 1000); // random.
+    public void Initialize(GameController gameController) {
+        this.gameController = gameController;
+
         // Set my random seedz.
+        currDriftTime = Random.Range(0, 1000);
         seed0 = Random.Range(-1000, 1000);
         seed1 = Random.Range(-1000, 1000);
         seed2 = Random.Range(-1000, 1000);
         seed3 = Random.Range(-1000, 1000);
         seed4 = Random.Range(-1000, 1000);
         seed5 = Random.Range(-1000, 1000);
+
+        // Start hidden.
+        go_bodyVisuals.SetActive(false);
     }
     private void DestroySelf() {
+        gameController.OnGhoulDestroyed(this);
         Destroy(this.gameObject);
     }
 

@@ -7,10 +7,13 @@ using TMPro;
 public class GameHUD : MonoBehaviour
 {
     // Components
-    [SerializeField] private GameObject go_gameOverPopup;
+    [SerializeField] private GameOverPopup gameOverPopup;
     [SerializeField] private GameObject go_paused;
+    [SerializeField] private GameObject go_startPlayingInstructions;
+    [SerializeField] private GameObject go_timeLeft;
     [SerializeField] private TextMeshProUGUI t_timeLeft;
-    [SerializeField] private TextMeshProUGUI t_numGhoulsSlayedVal;
+    [SerializeField] private TextMeshProUGUI t_numGhoulsSlainLVal;
+    [SerializeField] private TextMeshProUGUI t_numGhoulsSlainRVal;
     // References
     [SerializeField] private GameController gameController;
 
@@ -19,14 +22,9 @@ public class GameHUD : MonoBehaviour
     // Awake
     // ----------------------------------------------------------------
     private void Awake() {
-        go_gameOverPopup.SetActive(false);
         go_paused.SetActive(false);
     }
-    public void OnSetGameState_Playing() {
-        this.gameObject.SetActive(true);
-        go_gameOverPopup.SetActive(false);
-        UpdateTexts();
-    }
+
 
     // ----------------------------------------------------------------
     // Update
@@ -36,19 +34,39 @@ public class GameHUD : MonoBehaviour
         t_timeLeft.text = TextUtils.ToTimeString_ms(gameController.TimeLeft);
     }
 
+
     // ----------------------------------------------------------------
     // Doers
     // ----------------------------------------------------------------
     public void UpdateTexts() {
-        t_numGhoulsSlayedVal.text = gameController.NumGhoulsCaught.ToString();
+        t_numGhoulsSlainLVal.text = gameController.NumGhoulsSlainL.ToString();
+        t_numGhoulsSlainRVal.text = gameController.NumGhoulsSlainR.ToString();
         go_paused.SetActive(gameController.IsPaused);
     }
+
 
     // ----------------------------------------------------------------
     // Events
     // ----------------------------------------------------------------
-    public void OnGameOver() {
-        go_gameOverPopup.SetActive(true);
+    public void OnSetGameState(GameController.GameState state) {
+        // Hide things by default.
+        go_timeLeft.SetActive(false);
+        go_startPlayingInstructions.SetActive(false);
+        gameOverPopup.Hide();
+
+        // Show what makes sense.
+        switch (state) {
+            case GameController.GameState.Setup0:
+                go_startPlayingInstructions.SetActive(true);
+                break;
+            case GameController.GameState.Playing:
+                UpdateTexts();
+                go_timeLeft.SetActive(true);
+                break;
+            case GameController.GameState.GameOver:
+                gameOverPopup.Show();
+                break;
+        }
     }
 
 

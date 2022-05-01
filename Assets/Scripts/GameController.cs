@@ -5,40 +5,33 @@ using Assets.Scripts.Common.Utils;
 using UnityEngine;
 
 public class GameController : MonoBehaviour {
-    public enum GameState { Undefined, Setup0, Setup1, Playing, GameOver }
+    public enum GameState { Undefined, Setup0, Setup1, PrePlayCountdown, Playing, GameOver }
     // References
-    [SerializeField] private BeamFireVisuals beamFireVisuals;
     [SerializeField] private GameHUD gameHUD;
     [SerializeField] private GameObject go_gameOverLight;
     [SerializeField] private Transform tf_head; // headset.
     [SerializeField] private Mitt mittL;
-    //[SerializeField] private Mitt mittR;
-    [SerializeField] private Gun gunR;
+    [SerializeField] private Mitt mittR;
     [SerializeField] private PlayerNarration playerNarration;
     [SerializeField] private AudioClip[] fireBeamSounds;
     [SerializeField] private AudioClip[] grabSounds;
     [SerializeField] private AudioClip[] slaySounds;
     [SerializeField] private AudioClip[] escapeSounds;
+    [SerializeField] private AudioClip clip_correctChime;
+    [SerializeField] private AudioClip clip_prePlayCountdown;
+    [SerializeField] private AudioClip gameplayCountdown;
     [SerializeField] private float ghoulSpeedUpTime;
-    
     private List<Ghoul> ghouls = new List<Ghoul>();
 
     // Properties
     [SerializeField] public float TimePerRound = 91;
-    public const float BeamChargeupDuration = 2f;
     public GameState gameState { get; private set; } = GameState.Setup0;
-    public int NumBeamsFired { get; private set; } = 0;
-    public int NumGhoulsCaught { get; private set; } = 0;
-    public bool IsChargingBeam { get; private set; }
-    public float TimeChargingBeam { get; private set; } // how long we've held down a beam charge button.
+    public int NumGhoulsSlainL { get; private set; } = 0;
+    public int NumGhoulsSlainR { get; private set; } = 0;
     public float TimeLeft { get; private set; }
     public bool IsPaused { get; private set; } = false;
     public bool IsGameOver { get { return gameState == GameState.GameOver; } }
 
-    // Getters
-    private bool MayStartChargingBeam() {
-        return !IsChargingBeam;// && (mittL.IsTouchingVibCore);// || mittR.IsTouchingVibCore);
-    }
 
 
     // ----------------------------------------------------------------
@@ -46,7 +39,7 @@ public class GameController : MonoBehaviour {
     // ----------------------------------------------------------------
     void Start() {
         //SetGameState_Setup0();
-        SetGameState_Playing();
+        SetGameState(GameState.Setup0);
 
         // Add event listeners!
         OVRManager.HMDMounted += OnGainFocus;
@@ -75,6 +68,16 @@ public class GameController : MonoBehaviour {
         UpdateTimeScale();
     }
 
+    private void MaybeSpawnAGhoul() {
+        if (gameState == GameState.Playing && ghouls.Count < 2) {
+            var newObj = Instantiate(ResourcesHandler.Instance.Ghoul).GetComponent<Ghoul>();
+            newObj.Initialize(this);
+            ghouls.Add(newObj);
+        }
+        // Try again in a few seconds.
+        Invoke("MaybeSpawnAGhoul", 2f);
+    }
+
 
     // ----------------------------------------------------------------
     // Update
@@ -88,29 +91,24 @@ public class GameController : MonoBehaviour {
 
         switch (gameState) {
             case GameState.Setup0: Update_Setup0(); break;
-            case GameState.Setup1: Update_Setup1(); break;
+            //case GameState.Setup1: Update_Setup1(); break;
             case GameState.Playing: Update_Playing(); break;
             case GameState.GameOver: Update_GameOver(); break;
         }
     }
 
     private void Update_Setup0() {
-        if (InputManager.Instance.handTriggerIndexL>0.5f && InputManager.Instance.handTriggerIndexR>0.5f) {
-            SetGameState_Setup1();
+        if ((InputManager.Instance.handTriggerIndexL>0.5f && InputManager.Instance.handTriggerIndexR>0.5f)
+            || Input.GetKeyDown(KeyCode.Space)
+        ) {
+            SetGameState(GameState.PrePlayCountdown);
         }
     }
-    private void Update_Setup1() {
+    //private void Update_Setup1() {
 
-    }
+    //}
     private void Update_Playing() {
         RegisterButtonInput();
-
-        if (IsChargingBeam) {
-            TimeChargingBeam += Time.deltaTime;
-            if (TimeChargingBeam >= BeamChargeupDuration) {
-                FireBeam(gunR.transform);
-            }
-        }
 
         // Countdown!
         TimeLeft -= Time.deltaTime;
@@ -119,28 +117,37 @@ public class GameController : MonoBehaviour {
         }
     }
     private void Update_GameOver() {
-
+        if (InputManager.Instance.handTriggerIndexL>0.5f && InputManager.Instance.handTriggerIndexR>0.5f) {
+            SceneHelper.ReloadScene();
+        }
     }
 
 
-    private void SetGameState_Setup0() {
-        go_gameOverLight.SetActive(false);
-        gameHUD.gameObject.SetActive(false);
-        //ghouls = new List<Ghoul>(FindObjectsOfType<Ghoul>()); // hacky, just find all the ghouls that are already in the scene just in case.
-    }
-    private void SetGameState_Setup1() {
-        gameState = GameState.Playing;
-        playerNarration.OnSetGameState_Setup1();
-    }
-    private void SetGameState_Playing() {
-        gameState = GameState.Playing;
-        TimeLeft = TimePerRound;
-        playerNarration.OnSetGameState_Playing();
-        gameHUD.OnSetGameState_Playing();
-        MaybeSpawnAGhoul(); // this will definitely spawn a ghoul.
-    }
-    private void SetGameState_GameOver() {
-        gameState = GameState.GameOver;
+    private void SetGameState(GameState state) {
+        gameState = state;
+        switch (gameState) {
+            case GameState.Setup0:
+                go_gameOverLight.SetActive(false);
+                gameHUD.gameObject.SetActive(false);
+                break;
+            case GameState.Setup1:
+                playerNarration.OnSetGameState_Setup1();
+                break;
+            case GameState.PrePlayCountdown:
+                SoundController.Instance.Play(clip_prePlayCountdown);
+                Invoke("OnPrePlayCountdownDone", 3);
+                break;
+            case GameState.Playing:
+                TimeLeft = TimePerRound;
+                playerNarration.OnSetGameState_Playing();
+                MaybeSpawnAGhoul(); // this will definitely spawn a ghoul.
+                break;
+            case GameState.GameOver:
+                gameState = GameState.GameOver;
+                break;
+        }
+        // Tell the HUD!
+        gameHUD.OnSetGameState(gameState);
     }
 
 
@@ -148,21 +155,53 @@ public class GameController : MonoBehaviour {
 
 
     private void RegisterButtonInput() {
-        // Start charging beam!
-        if (MayStartChargingBeam()) {
-            if (InputManager.Instance.GetTriggerDown_PointerR() || Input.GetKeyDown(KeyCode.F)) {
-                StartChargingBeam();
-            }
+        if (mittL.IsTouchingCore && InputManager.Instance.GetButtonDown_FireGunL()) {
+            FireGunL();
+        }
+        if (mittR.IsTouchingCore && InputManager.Instance.GetButtonDown_FireGunR()) {
+            FireGunR();
         }
     }
 
-    private void StartChargingBeam() {
-        // HACK! Note: poorly worded functions. #gamejam
-        beamFireVisuals.OnStartChargingBeam();
-        SoundController.Instance.PlayRandom(fireBeamSounds);
-        IsChargingBeam = true;
-        TimeChargingBeam = 0;
+    private const float GhoulCoreSize = 0.1f; // NOTE: Not applied anywhere else! Independent from ProximityVibrator.
+    private Ghoul GetGhoulAtPos(Vector3 pos) {
+        foreach (Ghoul ghoul in ghouls) {
+            if (Vector3.Distance(pos, ghoul.transform.position) < GhoulCoreSize) return ghoul;
+        }
+        return null;
     }
+
+    private void FireGunL() {
+        Ghoul ghoulToSlay = GetGhoulAtPos(mittL.transform.position);
+        mittL.OnFireGun(ghoulToSlay == null);
+        // Slay or Miss!
+        if (ghoulToSlay != null) {
+            SlayGhoulL(ghoulToSlay);
+        }
+        else {
+            OnMissGhoul();
+        }
+    }
+    private void FireGunR() {
+        Ghoul ghoulToSlay = GetGhoulAtPos(mittR.transform.position);
+        mittR.OnFireGun(ghoulToSlay == null);
+        // Slay or Miss!
+        if (ghoulToSlay != null) {
+            SlayGhoulR(ghoulToSlay);
+        }
+        else {
+            OnMissGhoul();
+        }
+    }
+
+    private void OnMissGhoul() {
+        foreach (var ghoul in ghouls) {
+            ghoul.SpeedUpTimeLeft = ghoulSpeedUpTime;
+        }
+        var aGhoul = ghouls.RandomItem();
+        SoundController.Instance.PlayRandomAt(escapeSounds, aGhoul.transform.position);
+    }
+
 
 
     // ----------------------------------------------------------------
@@ -180,70 +219,33 @@ public class GameController : MonoBehaviour {
             Time.timeScale = 1;
     }
 
-    RaycastHit[] hits;
-    private void FireBeam(Transform tf_fireSource) {
-        // Increment NumBeamsFired.
-        
-        NumBeamsFired++;
-        IsChargingBeam = false;
-        // Raycast!
-        Ghoul ghoulToSlay = null;
-        hits = Physics.RaycastAll(tf_fireSource.position, tf_fireSource.forward);
-        foreach (RaycastHit hit in hits) {
-            GhoulCore ghoulBody = hit.collider.GetComponent<GhoulCore>();
-            if (ghoulBody != null) {
-                ghoulToSlay = hit.collider.GetComponentInParent<Ghoul>();
-                break;
-            }
-        }
-        // Slay or Miss!
-        if (ghoulToSlay != null) {
-            SlayGhoul(ghoulToSlay);
-            Debug.Log("SLAYED ghoul!");
-        }
-        else if (ghouls.Any())
-        {
-            foreach (var ghoul in ghouls)
-            {
-                ghoul.SpeedUpTimeLeft = ghoulSpeedUpTime;
-            }
-            var aGhoul = ghouls.RandomItem();
-            SoundController.Instance.PlayRandomAt(escapeSounds, aGhoul.transform.position);
-            Debug.Log("Misssed ghoul!");
-        }
-        
-        //TODO speed up ghosts on miss
-
-        beamFireVisuals.OnFireBeam(ghoulToSlay!=null);
-    }
-    private void MaybeSpawnAGhoul() {
-        Ghoul newObj = Instantiate(ResourcesHandler.Instance.Ghoul).GetComponent<Ghoul>();
-        ghouls.Add(newObj);
-        // Maybe make another one in a minute if there aren't enough!
-        if (ghouls.Count < 2) {
-            Invoke("MaybeSpawnAGhoul", 2f);
-        }
-    }
-
 
     // ----------------------------------------------------------------
     // Events
     // ----------------------------------------------------------------
-    public void SlayGhoul(Ghoul ghoul) {
-        // Slay ghoul!
-        SoundController.Instance.PlayRandomAt(slaySounds, ghoul.transform.position);
-        ghoul.SlayMe();
-        NumGhoulsCaught ++;
-        gameHUD.UpdateTexts();
-        // Make a new one, baby.
-        Invoke("MaybeSpawnAGhoul", 1f);
+    private void SlayGhoulL(Ghoul ghoul) {
+        NumGhoulsSlainL++;
+        OnEitherPlayerSlayGhoul(ghoul);
     }
+    private void SlayGhoulR(Ghoul ghoul) {
+        NumGhoulsSlainR++;
+        OnEitherPlayerSlayGhoul(ghoul);
+    }
+    private void OnEitherPlayerSlayGhoul(Ghoul ghoul) {
+        SoundController.Instance.PlayRandomAt(slaySounds, ghoul.transform.position);
+        SoundController.Instance.PlayAt(clip_correctChime, ghoul.transform.position);
+        ghoul.SlayMe();
+        gameHUD.UpdateTexts();
+    }
+
+
     private void OnTimeOver() {
         TimeLeft = 0;
-        SetGameState_GameOver();
-        gameHUD.OnGameOver();
-        beamFireVisuals.OnGameOver();
+        SetGameState(GameState.GameOver);
         go_gameOverLight.SetActive(true);
+    }
+    public void OnGhoulDestroyed(Ghoul ghoul) {
+        ghouls.Remove(ghoul);
     }
 
 
@@ -253,8 +255,55 @@ public class GameController : MonoBehaviour {
 
 
 
+//private void StartChargingBeam() {
+//    // HACK! Note: poorly worded functions. #gamejam
+//    beamFireVisuals.OnStartChargingBeam();
+//    SoundController.Instance.PlayRandom(fireBeamSounds);
+//    IsChargingBeam = true;
+//    TimeChargingBeam = 0;
+//}
 
 //void FireHeadBullet() {
 //    Bullet newObj = Instantiate(ResourcesHandler.Instance.Bullet).GetComponent<Bullet>();
 //    newObj.Initialize(this, tf_head);
 //}
+
+/*
+RaycastHit[] hits;
+private void FireBeam(Transform tf_fireSource) {
+    // Increment NumBeamsFired.
+
+    NumBeamsFired++;
+    IsChargingBeam = false;
+    // Raycast!
+    Ghoul ghoulToSlay = null;
+    hits = Physics.RaycastAll(tf_fireSource.position, tf_fireSource.forward);
+    foreach (RaycastHit hit in hits) {
+        GhoulCore ghoulBody = hit.collider.GetComponent<GhoulCore>();
+        if (ghoulBody != null) {
+            ghoulToSlay = hit.collider.GetComponentInParent<Ghoul>();
+            break;
+        }
+    }
+    // Slay or Miss!
+    if (ghoulToSlay != null) {
+        SlayGhoul(ghoulToSlay);
+        Debug.Log("SLAYED ghoul!");
+    }
+    // Play sound
+    else if (ghouls.Any())
+    {
+        foreach (var ghoul in ghouls)
+        {
+            ghoul.SpeedUpTimeLeft = ghoulSpeedUpTime;
+        }
+        var aGhoul = ghouls.RandomItem();
+        SoundController.Instance.PlayRandomAt(escapeSounds, aGhoul.transform.position);
+        Debug.Log("Misssed ghoul!");
+    }
+
+    //TODO speed up ghosts on miss
+
+    beamFireVisuals.OnFireBeam(ghoulToSlay!=null);
+}
+*/

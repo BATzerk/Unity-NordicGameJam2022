@@ -114,21 +114,31 @@ public class InputManager : MonoBehaviour {
 		return false;
     }
 
-	public bool GetButtonDown_FireHeadBullet() {
-		// Controller Buttons
-		if (OVRInput.GetDown(OVRInput.Button.One)
-		 || OVRInput.GetDown(OVRInput.Button.Two)
-		 || OVRInput.GetDown(OVRInput.Button.Three)
-		 || OVRInput.GetDown(OVRInput.Button.Four))
-			return true;
-		// Controller Triggers
+	public bool GetButtonDown_FireGunL() {
 		if (GetTriggerDown_IndexL()) return true;
-		if (GetTriggerDown_IndexR()) return true;
 		if (GetTriggerDown_PointerL()) return true;
-		if (GetTriggerDown_PointerR()) return true;
-		// Keyboard
-		return Input.GetKeyDown(KeyCode.Space);
+		return Input.GetKeyDown(KeyCode.L);
 	}
+	public bool GetButtonDown_FireGunR() {
+		if (GetTriggerDown_IndexR()) return true;
+		if (GetTriggerDown_PointerR()) return true;
+		return Input.GetKeyDown(KeyCode.R);
+	}
+	//public bool GetButtonDown_FireGun() {
+ //       // Controller Buttons
+ //       if (OVRInput.GetDown(OVRInput.Button.One)
+ //        || OVRInput.GetDown(OVRInput.Button.Two)
+ //        || OVRInput.GetDown(OVRInput.Button.Three)
+ //        || OVRInput.GetDown(OVRInput.Button.Four))
+ //           return true;
+ //       // Controller Triggers
+ //       if (GetTriggerDown_IndexL()) return true;
+ //       if (GetTriggerDown_IndexR()) return true;
+ //       if (GetTriggerDown_PointerL()) return true;
+ //       if (GetTriggerDown_PointerR()) return true;
+	//	// Keyboard
+	//	return Input.GetKeyDown(KeyCode.Space);
+	//}
 	public bool GetTriggerDown_IndexL() { return phandTriggerIndexL<0.1f && handTriggerIndexL>=0.1f; }
 	public bool GetTriggerDown_IndexR() { return phandTriggerIndexR<0.1f && handTriggerIndexR>=0.1f; }
 	public bool GetTriggerDown_PointerL() { return phandTriggerGripL<0.1f && handTriggerGripL>=0.1f; }

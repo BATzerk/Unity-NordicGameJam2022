@@ -13,7 +13,7 @@ public class BeamFireVisuals : MonoBehaviour
     // References
     [SerializeField] private GameController gameController;
 
-
+    /*
     // ----------------------------------------------------------------
     // Start
     // ----------------------------------------------------------------
@@ -50,5 +50,6 @@ public class BeamFireVisuals : MonoBehaviour
         sr_circle.enabled = false;
         sr_centerDot.enabled = false;
     }
+    */
 
 }

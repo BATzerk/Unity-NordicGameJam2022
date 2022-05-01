@@ -7,15 +7,17 @@ using Random = UnityEngine.Random;
 
 public class SoundController : MonoBehaviour
 {
+    // Properties
+    public int NumSources = 16;
     // References
     [SerializeField] private AudioClip[] randomSounds;
-    [SerializeField] private AudioSource[] sources;
     [SerializeField] private int sourceIndex = 0;
     [SerializeField] private float randomSoundDistance = 4;
     [SerializeField] private float randomSoundDistanceVariance = 1;
     [SerializeField] private float randomSoundMinInterval = 0.5f;
     [SerializeField] private float randomSoundMaxInterval = 5;
     [SerializeField] private float timeToNextRandomSound = 1;
+    private AudioSource[] sources;
 
     [SerializeField] private Transform listener;
     
@@ -44,6 +46,14 @@ public class SoundController : MonoBehaviour
     void Start()
     {
         Instance = this;
+        sources = new AudioSource[NumSources];
+        for (int i=0; i<NumSources; i++) {
+            AudioSource newSource = new GameObject().AddComponent<AudioSource>();
+            GameUtils.ParentAndReset(newSource.gameObject, this.transform);
+            newSource.name = "AudioSource" + i;
+            newSource.spatialBlend = 1;
+            sources[i] = newSource;
+        }
     }
 
     void Update()
