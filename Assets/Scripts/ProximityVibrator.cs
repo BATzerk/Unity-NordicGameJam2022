@@ -8,7 +8,7 @@ public class ProximityVibrator : MonoBehaviour
     [SerializeField] private SphereCollider myTrigger; // the trigger the Mitt overlaps with.
     // Properties
     [SerializeField] public float DistMax = 0.6f;
-    [SerializeField] public float DistMin = 0.08f;
+    [SerializeField] public float DistMin = 0.12f;
 
     // ----------------------------------------------------------------
     //  Start

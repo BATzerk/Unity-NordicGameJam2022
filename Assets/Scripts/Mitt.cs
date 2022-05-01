@@ -12,6 +12,7 @@ public class Mitt : MonoBehaviour
     [SerializeField] private OVRInput.Controller MyHandType;
     public bool IsTouchingCore { get; private set; } // TRUE if we're RIGHT inside the vibrator! If this is true, we'll go BUMP BUMP instead of vrrrrr.
     private float TonePitchHigh;
+    private float timeTouchingCore;
     // References
     [SerializeField] private GameController gameController;
     [SerializeField] private AudioSource as_tone; // looping tone.
@@ -50,6 +51,7 @@ public class Mitt : MonoBehaviour
 
 
         float vibVol = Mathf.InverseLerp(0.3f, 1, locToCore); // start vibrating only when we're closer than when the sound starts.
+        vibVol *= 0.2f; // hack!
         float toneVol = Mathf.Min(locToCore, 0.85f); // don't get like, too loud.
         float tonePitch = Mathf.Lerp(0.05f, 1.3f, locToCore);
 
@@ -58,9 +60,12 @@ public class Mitt : MonoBehaviour
         if (IsTouchingCore) {
             tonePitch = TonePitchHigh;
             // Rhythmically disable vibration.
-            if (Mathf.Sin(Time.unscaledTime*70f) > 0) {
+            if (Mathf.Sin(Time.unscaledTime*50f) > 0) {
                 vibVol = 0;
                 toneVol = 0.2f;
+            }
+            else {
+                vibVol = 1;
             }
         }
 
@@ -74,6 +79,17 @@ public class Mitt : MonoBehaviour
         // Apply bulb color!
         Color bulbEmissionColor = new ColorHSB(0.2f, 255, vibVol).ToColor();
         mr_bulb.material.SetColor("_EmissionColor", bulbEmissionColor);
+
+        // Update catchness!
+        if (IsTouchingCore) {
+            timeTouchingCore += Time.deltaTime;
+            if (timeTouchingCore >= 0.5f) {
+                gameController.MittInGhoulLongEnoughToCapture(this);
+            }
+        }
+        else {
+            timeTouchingCore = 0;
+        }
     }
 
 

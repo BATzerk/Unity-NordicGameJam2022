@@ -71,7 +71,7 @@ public class GameController : MonoBehaviour {
     }
 
     private void MaybeSpawnAGhoul() {
-        if (gameState == GameState.Playing && ghouls.Count < 2) {
+        if (gameState == GameState.Playing && ghouls.Count < 4) {
             var newObj = Instantiate(ResourcesHandler.Instance.Ghoul).GetComponent<Ghoul>();
             newObj.Initialize(this);
             ghouls.Add(newObj);
@@ -107,8 +107,19 @@ public class GameController : MonoBehaviour {
             case GameState.Playing: Update_Playing(); break;
             case GameState.GameOver: Update_GameOver(); break;
         }
+
+
+        timeUntilAutoNextStep -= Time.deltaTime;
+        if (timeUntilAutoNextStep <= 0) {
+            switch (gameState) {
+                case GameState.Setup0: SetGameState(GameState.PrePlayCountdown); break;
+                case GameState.Playing: SetGameState(GameState.GameOver); break;
+                case GameState.GameOver: SceneHelper.ReloadScene(); return;
+            }
+        }
     }
 
+    float timeUntilAutoNextStep;
     private void Update_Setup0() {
         if ((InputManager.Instance.handTriggerIndexL>0.5f && InputManager.Instance.handTriggerIndexR>0.5f)
             || Input.GetKeyDown(KeyCode.Space)
@@ -136,10 +147,12 @@ public class GameController : MonoBehaviour {
 
 
     private void SetGameState(GameState state) {
+        timeUntilAutoNextStep = 999999;
         gameState = state;
         switch (gameState) {
             case GameState.Setup0:
                 go_houseLights.SetActive(true);
+                timeUntilAutoNextStep = 8;
                 break;
             case GameState.Setup1:
                 go_houseLights.SetActive(true);
@@ -157,6 +170,7 @@ public class GameController : MonoBehaviour {
                 MaybeSpawnAGhoul(); // this will definitely spawn a ghoul.
                 break;
             case GameState.GameOver:
+                timeUntilAutoNextStep = 7f;
                 TimeLeft = 0;
                 go_houseLights.SetActive(true);
                 PlayWinnerSound();
@@ -199,6 +213,10 @@ public class GameController : MonoBehaviour {
         return null;
     }
 
+    public void MittInGhoulLongEnoughToCapture(Mitt mitt) { // HACK game jam.
+        if (mitt == mittL) FireGunL();
+        else FireGunR();
+    }
     private void FireGunL() {
         Ghoul ghoulToSlay = GetGhoulAtPos(mittL.transform.position);
         mittL.OnFireGun(ghoulToSlay != null);

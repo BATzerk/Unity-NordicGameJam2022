@@ -11,8 +11,8 @@ public class Ghoul : MonoBehaviour
     // Properties
     [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
     [SerializeField] private readonly float SpeedUpMultiplier = 3f; // applied to PerlinNoise
-    private Vector2 boundsX = new Vector2(-0.5f, 0.5f);
-    private Vector2 boundsY = new Vector2(0.5f, 1.5f);
+    private Vector2 boundsX = new Vector2(-0.7f, 0.7f);
+    private Vector2 boundsY = new Vector2(0.5f, 1.8f);
     private Vector2 boundsZ = new Vector2(0.3f, 1.8f);
     private bool isSlayed = false;
     public bool IsFound { get; private set; } = false;
