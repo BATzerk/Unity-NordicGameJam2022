@@ -8,13 +8,15 @@ public class GhoulCore : MonoBehaviour
     [SerializeField] private Ghoul myGhoul;
 
 
-
     // ----------------------------------------------------------------
     //  Events
     // ----------------------------------------------------------------
     public void OnMittEnterMe() {
         myGhoul.SetIsFoundTrue();
+        myGhoul.IsCoreTouched = true;
     }
-    public void OnMittExitMe() { }
+    public void OnMittExitMe() {
+        myGhoul.IsCoreTouched = false;
+    }
 
 }

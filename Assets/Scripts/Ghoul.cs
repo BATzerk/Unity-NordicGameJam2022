@@ -9,17 +9,17 @@ public class Ghoul : MonoBehaviour
     [SerializeField] private MeshRenderer mr_body;
     // Properties
     [SerializeField] private readonly float DriftSpeed = 0.04f; // applied to PerlinNoise
+    [SerializeField] private readonly float SpeedUpMultiplier = 3f; // applied to PerlinNoise
     private Vector2 boundsX = new Vector2(-0.5f, 0.5f);
     private Vector2 boundsY = new Vector2(0.5f, 1.5f);
     private Vector2 boundsZ = new Vector2(0.3f, 1.8f);
     private bool isSlayed = false;
     public bool IsFound { get; private set; } = false;
-    private float seed0;
-    private float seed1;
-    private float seed2;
-    private float seed3;
-    private float seed4;
-    private float seed5;
+    public bool IsCoreTouched=false;// { get; private set; } = false; // currently touched.
+    private float currDriftTime; // incremented every frame. Can be slowed or sped up.
+    private float seed0, seed1, seed2, seed3, seed4, seed5;
+
+    public float SpeedUpTimeLeft = 0f;
     // References
     [SerializeField] private Material m_slayed;
 
@@ -29,6 +29,7 @@ public class Ghoul : MonoBehaviour
     // ----------------------------------------------------------------
     void Start() {
         go_bodyVisuals.SetActive(false);
+        currDriftTime = Random.Range(0, 1000); // random.
         // Set my random seedz.
         seed0 = Random.Range(-1000, 1000);
         seed1 = Random.Range(-1000, 1000);
@@ -51,9 +52,13 @@ public class Ghoul : MonoBehaviour
             this.transform.position += new Vector3(0, 0.006f, 0);
         }
         else {
-            float xLoc = Mathf.PerlinNoise((Time.time+seed0)*DriftSpeed, (Time.time+seed1)*DriftSpeed);
-            float yLoc = Mathf.PerlinNoise((Time.time+seed2)*DriftSpeed, (Time.time+seed3)*DriftSpeed);
-            float zLoc = Mathf.PerlinNoise((Time.time+seed4)*DriftSpeed, (Time.time+seed5)*DriftSpeed);
+            SpeedUpTimeLeft = Mathf.Max(SpeedUpTimeLeft - Time.deltaTime, 0);
+            float driftSpeedScale = SpeedUpTimeLeft > 0 ? SpeedUpMultiplier : (IsCoreTouched ? 0 : 1);
+            float currDriftTimeDelta = Time.deltaTime * driftSpeedScale;
+            currDriftTime += Time.deltaTime * currDriftTimeDelta;
+            float xLoc = Mathf.PerlinNoise((currDriftTime+seed0)*DriftSpeed, (currDriftTime+seed1)*DriftSpeed);
+            float yLoc = Mathf.PerlinNoise((currDriftTime+seed2)*DriftSpeed, (currDriftTime+seed3)*DriftSpeed);
+            float zLoc = Mathf.PerlinNoise((currDriftTime+seed4)*DriftSpeed, (currDriftTime+seed5)*DriftSpeed);
             // Move around via PerlinNoise!
             this.transform.localPosition = new Vector3(
                 Mathf.Lerp(boundsX.x, boundsX.y, xLoc),

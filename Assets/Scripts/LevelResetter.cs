@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelResetter : MonoBehaviour
 {
     // Properties
+    private float TimeToHoldResetButton = 1.8f;
     private float timeHeldResetButton;
     private bool isResetButtonHeld;
 
@@ -21,7 +22,7 @@ public class LevelResetter : MonoBehaviour
         // Maybe reset!
         if (isResetButtonHeld) {
             timeHeldResetButton += Time.deltaTime;
-            if (timeHeldResetButton > 3) {
+            if (timeHeldResetButton > TimeToHoldResetButton) {
                 SceneHelper.ReloadScene();
             }
         }

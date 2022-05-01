@@ -22,6 +22,11 @@ public class GameHUD : MonoBehaviour
         go_gameOverPopup.SetActive(false);
         go_paused.SetActive(false);
     }
+    public void OnSetGameState_Playing() {
+        this.gameObject.SetActive(true);
+        go_gameOverPopup.SetActive(false);
+        UpdateTexts();
+    }
 
     // ----------------------------------------------------------------
     // Update
