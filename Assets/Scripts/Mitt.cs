@@ -51,7 +51,7 @@ public class Mitt : MonoBehaviour
 
 
         float vibVol = Mathf.InverseLerp(0.3f, 1, locToCore); // start vibrating only when we're closer than when the sound starts.
-        vibVol *= 0.2f; // hack!
+        vibVol *= 0.5f; // hack!
         float toneVol = Mathf.Min(locToCore, 0.85f); // don't get like, too loud.
         float tonePitch = Mathf.Lerp(0.05f, 1.3f, locToCore);
 
